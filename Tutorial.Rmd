@@ -1,33 +1,37 @@
 ---
-title: "A bird's eye in the practical analysis of fMRI data with FSL"
-author: "Sara Jahfari"
+title: "A bird's eye in the analysis of fMRI data with fMRIPrep and FSL"
+author: "Sara Jahfari and Martin Szinte"
 date: "11/14/2018"
 output: 
   prettydoc::html_pretty:
     toc: true
     toc_depth: 3
     number_sections: true
-    theme: cayman 
+    theme: leonids 
     df_print: paged
-    highlight: github
+    highlight: vignette
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = T,eval=FALSE,tidy=T)
+library(reticulate)
+use_python("/usr/bin/python")
 ```
 
 
-# Working at the Spinoza 
+# The basics 
 ## Working with Linux
-Linux is an open source operating system that is commonly used for scientific research. reprieve & FSL, the programs we use for fMRI analysis in this tutorial, both run on the Linux, or OS operating system. Because we will be using Linux servers, this tutorial is based on lix. The drawback of Linux is that most students have no experience with this operating system. This small manual, or tutorial, introduces some of the most relevant aspects of Linux.
+Linux is an open source operating system that is commonly used for scientific research. fMRIPrep & FSL, the programs we use for fMRI analysis in this tutorial, both run on Linux, or the OS operating system. Because we will be using Linux servers, this tutorial is based on Linux. The drawback of Linux is that most students have no experience with this operating system. Therefore we start with a small introduction.
 
 ## Getting Started
-The recordings have been placed in **/data1/projects/fMRI-course/[name of your group]** on the server we will be working from. Throughout the afternoon you will work from this folder, to get a glimpse in how to analyse fMRI data using *BIDS*, *fMRIPrep* and *FSL*. Please log in onto the Spinoza server using your own credentials. Linux programs can be started via a link (for instance via the links on the desktop or under the 'Applications' button) or via the console window. This console window is similar to the windows Command Prompt. The console window is also called terminal depending on the Linux flavor. 
+The recordings have been placed in **/data1/projects/fMRI-course/[name of your group]** on the server we will be working from. Throughout the afternoon you will work from this folder, to get a glimpse in how to analyse fMRI data using *BIDS*, *fMRIPrep* and *FSL*. Please log in onto the Spinoza server using your own credentials. Linux programs can be started via a link (for instance via the links on the desktop or under the 'Applications' button), or via the console window. This console window is similar to the windows Command Prompt. The console window is also called terminal depending on the Linux flavor. 
 
 ## Working directory
 Please open a new terminal window (right click mouse, and choose *Open Terminal*) and type in the following command to move towards your **/data1/projects/fMRI-course/[name of your group]** folder:
 
-*cd /data1/projects/fMRI-course/[name of your group]*
+```{bash}
+cd /data1/projects/fMRI-course/[name of your group]
+```
 
 This command will make sure that all your following instructions are carried out from the course folder.
 
@@ -35,23 +39,110 @@ This command will make sure that all your following instructions are carried out
 After the class on Tuesday we trust that you now understand what BIDS is, and why we all urge you to start using BIDS. 
 
 ## The BIDS data structure
+The raw files that you have been collecting have been exported with the extentiosn .par and .rec. In this section we will convert these files to NIFTI, organize them in accordance with the BIDS guidelines, and inspect the recordings with FSLeyes.
+
 ### Convert files to BIDS structure
+1. Convert files from PAR/REC to nifti
+  + use the cd command to go to your raw_data directory
+  + get the convert2niigz.py script from the BIDS folder in 'https://github.com/sarajahfari/Spinoza_Course', and put this file in **/data1/projects/fMRI-course/[name of your group]**
+  + in terminal cd to the folder where convert2niigz.py script is in and use the following command: 
+
+```{bash}  
+python convert2niigz.py [path to your raw_data folder] 
+```
+
+2. Convert files to BIDS
+  + get the bids_generator.py script from the BIDS folder in 'https://github.com/sarajahfari/Spinoza_Course', and put this in **/data1/projects/fMRI-course/[name of your group]**
+  + cd to this directory
+  + type: mkdir bids_data and press enter (this is to make a directory where your converted BIDS files will be saved)
+  + Then use the bids_generator.py script to convert your nifit files to BIDS
+```{bash}  
+python bids_generator.py [path to raw data ] \
+[path to bids_data] [subject bids number e.g. sub-001] \
+[task name, e.g., Stop Signal]
+```
+  
+  + change timing nifit files BOLD to fit BIDS description
+  
+```{python}
+# import module
+import nibabel as nb
+
+# change timing
+file_dir = '[path to your bids_data folder]/sub-001/func/[insertname]_bold.nii.gz'
+load_file =  nb.load(file_dir)  
+
+header = load_file.header
+affine = load_file.affine
+data = load_file.get_data()
+header['pixdim'][4] = header['pixdim'][4]*1000
+
+img = nb.Nifti1Image(data, affine=affine, header=header)
+img.to_filename(file_dir)
+
+# taken from change_tr_nii.py written by M. Szinte
+```
+  
+  3. Make the .json files needed 
+  [do this later with Martin, also ask about change_tr_nii.py]
+
+  
+  
+
+
 ### Inspect Raw images with FSL
-FSLeyes allows you to visually inspect most types of MRI images. To inspect images, first type fsleyes into your command window and press enter. To open an image, select the 'add from file' from the File menu. A file opening dialog will appear. Now browse to the directory where you just stored the BIDS .nii.gz files and start inpecting them.
+FSLeyes allows you to visually inspect most types of MRI images. Before you start your inspection, a few short notes on what you will be seeing on screen. Each selected image will be opened in an orthogonal view; coronal, sagittal and axial views are displayed simultaneously. If there is sufficient information present in the image header, L, R, A, P, S, I (Left, Right, Anterior=front, Posterior=back, Superior=top, Inferior=bottom) orientation markers will be displayed, making the orientation clear. 
 
-Before you start your inspection, a few short notes on what you will be seeing on screen. Each selected image will be opened in an Orthogonal view; coronal, sagittal and axial views are displayed simultaneously. If there is sufficient information present in the image header, L, R, A, P, S, I (Left, Right, Anterior=front, Posterior=back, Superior=top, Inferior=bottom) orientation markers will be displayed, making the orientation clear. 
+1. To inspect images, first in your terminal type:
+```{bash}
+fsleyes
+```
 
-To inspect the anatomical scan select the _T1w.nii.gz file from the anat folder. FSLeyes will now load the recorded structural scan. Click on one of the brains with your mouse, and hold down the button to navigate across the whole brain.
+2. To open an image, select the 'add from file' from the File menu. A file opening dialog will appear. Now browse to the directory where you just stored the BIDS files and start inpecting them.
 
-Just to give you an intuition in how the epi or fMRI scan (lot’s of very fast brain recordings) differs from the strucural (MRI) scan we would now like you to open the _bold.nii.gz scan in the func folder. Notice how the quality of this image is much lower. This is because with fMRI a lot of brain images are recorded with only a short time between them which makes the quality of the image go down. You can click on the movie icon to quickly go over all images.
+3. To inspect the anatomical scan select the _T1w.nii.gz file from the anat folder. FSLeyes will now load the recorded structural scan. Click on one of the brains with your mouse, and hold down the button to navigate across the whole brain.
+
+4. Just to give you an intuition in how the epi or fMRI scan (lot’s of very fast brain recordings) differs from the strucural (MRI) scan we would now like you to open the _bold.nii.gz scan in the func folder. Notice how the quality of this image is much lower. This is because with fMRI a lot of brain images are recorded with only a short time between them, which makes the quality of the image go down. You can click on the movie icon to quickly go over all images.
 
 Structural MRI scans improve the process of normalizing the fMRI scan to a standard space. This step is important because you want to report, in the end, on the activation at the group level (referring to the entire group). The brain of individual subjects differ substantially from each other and therefore the fMRI scans (epi) need to be normalized towards a common space for all participants. We will now turn, to the preprocessing of data using fMRIPrep.
 
 # fMRIPrep
+Now that we have organized the files in BIDS format, we can start running the preprocessing with fMRIprep.
 
 ## how to run fMRIPrep
+1. download the fmriprep_tmux.py from the github repro
+2. Because this processing might take a while we would like to run the code on the server, and keep it running overnight. To do this go to terminal and enter:
+```{bash}
+tmux
+```
++ this will open a new session in which we can run the preprocessing
+3. Now cd to the frmiprep_tmux.py folder and use the following command to run fMRIPrep
+```{bash}
+python fmriprep_tmux.py [path to bids directory] \
+                        [path to deriv_data directory]\
+                        [path to temp directory]\
+                        [bids subject name, e.g., sub-001]\
+                        [server number of threds, ask us!]\
+                        [use ica? please fill in 0 which is NO] 
+```
+4. logout of your tmux session. In your terminal type:
+```{bash}
+ctrl+b and then d
+```
+
 ## Inspecting the output
+1. log into your tmux session againg to check if the preprocessing is done.
+```{bash}
+tmux ls
+tmux attach -tx
+```
+2. The output of fMRIPrep is saved in the deriv_data folder, where you can easely inpsect the preprocessing by opening the html file. Given the class on tuesday, how do you think the preprocessing looks? If you have doubds, call for one of us.
+
+3. Again use fsleyes to load the preprocessed MNI _BOLD and T1w files. What is the difference with the raw BIDS files you saw?
+
 ## Reporting
+Everytime you run fMRIPrep, the html file will contain a method section, where all the steps are carefully descirbed. Please honor the authors, by using this as a template for writing your method section for reports!
+
 ## Files to use for the next level
 
 # Lower level Analysis in FSL
