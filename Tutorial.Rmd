@@ -1,6 +1,6 @@
 ---
 title: "A bird's eye in the analysis of fMRI data with fMRIPrep and FSL"
-author: "Sara Jahfari and Martin Szinte"
+author: "S. Jahfari & M. Szinte"
 date: "11/14/2018"
 output: 
   prettydoc::html_pretty:
@@ -86,10 +86,6 @@ img.to_filename(file_dir)
   3. Make the .json files needed 
   [do this later with Martin, also ask about change_tr_nii.py]
 
-  
-  
-
-
 ### Inspect Raw images with FSL
 FSLeyes allows you to visually inspect most types of MRI images. Before you start your inspection, a few short notes on what you will be seeing on screen. Each selected image will be opened in an orthogonal view; coronal, sagittal and axial views are displayed simultaneously. If there is sufficient information present in the image header, L, R, A, P, S, I (Left, Right, Anterior=front, Posterior=back, Superior=top, Inferior=bottom) orientation markers will be displayed, making the orientation clear. 
 
@@ -141,7 +137,7 @@ tmux attach -tx
 3. Again use fsleyes to load the preprocessed MNI _BOLD and T1w files. What is the difference with the raw BIDS files you saw?
 
 ## Reporting
-Everytime you run fMRIPrep, the html file will contain a method section, where all the steps are carefully descirbed. Please honor the authors, by using this as a template for writing your method section for reports!
+Everytime you run fMRIPrep, the html file will contain a method section, where all the steps are carefully descirbed. Please honor the developers by using this as a template for writing your method section for reports!
 
 ## Files to use for the next level
 
