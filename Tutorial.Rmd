@@ -13,7 +13,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = T,eval=FALSE,tidy=T)
+knitr::opts_chunk$set(echo = T,eval=FALSE,tidy=T,fig.keep="all")
 library(reticulate)
 use_python("/usr/bin/python")
 ```
@@ -39,7 +39,7 @@ This command will make sure that all your following instructions are carried out
 After the class on Tuesday we trust that you now understand what BIDS is, and why we all urge you to start using BIDS. 
 
 ## The BIDS data structure
-The raw files that you have been collecting have been exported with the extentiosn .par and .rec. In this section we will convert these files to NIFTI, organize them in accordance with the BIDS guidelines, and inspect the recordings with FSLeyes.
+The raw files that you have been collecting have been exported with the extension .par and .rec. In this section we will convert these files to NIFTI, organize them in accordance with the BIDS guidelines, and inspect the recordings with FSLeyes.
 
 ### Convert files to BIDS structure
 1. Convert files from PAR/REC to nifti
@@ -55,14 +55,14 @@ python convert2niigz.py [path to your raw_data folder]
   + get the bids_generator.py script from the BIDS folder in 'https://github.com/sarajahfari/Spinoza_Course', and put this in **/data1/projects/fMRI-course/[name of your group]**
   + cd to this directory
   + type: mkdir bids_data and press enter (this is to make a directory where your converted BIDS files will be saved)
-  + Then use the bids_generator.py script to convert your nifit files to BIDS
+  + Then use the bids_generator.py script to convert your nifti files to BIDS
 ```{bash}  
 python bids_generator.py [path to raw data ] \
 [path to bids_data] [subject bids number e.g. sub-001] \
 [task name, e.g., Stop Signal]
 ```
   
-  + change timing nifit files BOLD to fit BIDS description
+  + change timing Nifti files BOLD to fit BIDS description
   
 ```{python}
 # import module
@@ -89,7 +89,7 @@ img.to_filename(file_dir)
 
 4. Make event files
 
-In order to run preprocessing and the analysis of you experiment later, we need to convert the timing files from the scanner such that we know when each event occured across the scan, and what the duration was (i.e., Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.). In the stop task, an event starts when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
+In order to run preprocessing and the analysis of you experiment later, we need to convert the timing files from the scanner such that we know when each event occurred across the scan, and what the duration was (i.e., Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.). In the stop task, an event starts when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
 
 + cd back to the directory with all the git codes, and open R (just type R into terminal). The enter the following code. Make sure to fill in the path where you saved the raw input from the scanner. 
 
@@ -120,11 +120,11 @@ FSLeyes allows you to visually inspect most types of MRI images. Before you star
 fsleyes
 ```
 
-2. To open an image, select the 'add from file' from the File menu. A file opening dialog will appear. Now browse to the directory where you just stored the BIDS files and start inpecting them.
+2. To open an image, select the 'add from file' from the File menu. A file opening dialog will appear. Now browse to the directory where you just stored the BIDS files and start inspecting them.
 
 3. To inspect the anatomical scan select the _T1w.nii.gz file from the anat folder. FSLeyes will now load the recorded structural scan. Click on one of the brains with your mouse, and hold down the button to navigate across the whole brain.
 
-4. Just to give you an intuition in how the epi or fMRI scan (lot’s of very fast brain recordings) differs from the strucural (MRI) scan we would now like you to open the _bold.nii.gz scan in the func folder. Notice how the quality of this image is much lower. This is because with fMRI a lot of brain images are recorded with only a short time between them, which makes the quality of the image go down. You can click on the movie icon to quickly go over all images.
+4. Just to give you an intuition in how the epi or fMRI scan (lot’s of very fast brain recordings) differs from the structural (MRI) scan we would now like you to open the _bold.nii.gz scan in the func folder. Notice how the quality of this image is much lower. This is because with fMRI a lot of brain images are recorded with only a short time between them, which makes the quality of the image go down. You can click on the movie icon to quickly go over all images.
 
 Structural MRI scans improve the process of normalizing the fMRI scan to a standard space. This step is important because you want to report, in the end, on the activation at the group level (referring to the entire group). The brain of individual subjects differ substantially from each other and therefore the fMRI scans (epi) need to be normalized towards a common space for all participants. We will now turn, to the preprocessing of data using fMRIPrep.
 
@@ -140,7 +140,7 @@ tmux
 ```
 + this will open a new session in which we can run the preprocessing
 
-3. Now cd to the frmiprep_tmux.py folder and use the following command to run fMRIPrep
+3. Now cd to the fmriprep_tmux.py folder and use the following command to run fMRIPrep
 ```{bash}
 python fmriprep_tmux.py [path to bids directory] \
                         [path to deriv_data directory]\
@@ -157,17 +157,17 @@ ctrl+b and then d
 
 ## Inspecting the output
 
-1. log into your tmux session againg to check if the preprocessing is done.
+1. log into your tmux session again to check if the preprocessing is done.
 ```{bash}
 tmux ls
 tmux attach -tx
 ```
-2. The output of fMRIPrep is saved in the deriv_data folder, where you can easely inpsect the preprocessing by opening the html file. Given the class on tuesday, how do you think the preprocessing looks? If you have doubds, call for one of us.
+2. The output of fMRIPrep is saved in the deriv_data folder, where you can easily inspect the preprocessing by opening the html file. Given the class on Tuesday, how do you think the preprocessing looks? If you have doubts, call for one of us.
 
 3. Again use fsleyes to load the preprocessed MNI _BOLD and T1w files. What is the difference with the raw BIDS files you saw?
 
 ## Reporting
-Everytime you run fMRIPrep, the html file will contain a method section, where all the steps are carefully descirbed. Please honor the developers by using this as a template for writing your method section for reports!
+Every time you run fMRIPrep, the html file will contain a method section, where all the steps are carefully described. Please honor the developers by using this as a template for writing your method section for reports!
 
 ## Files to use for the next level
 
@@ -179,14 +179,27 @@ Now that we have carefully preprocessed the recorded _bold.nii.gz files we want 
 ```{bash}
 Feat
 ```
-2. Data
-+ The first thing we need to do is to define where FSL can find the preprocessed bold data. To do this please select the Data tab from Feat, and then click on Select 4D data. Then click on the yellow folder button to select the recorded 'xx_bold_space-MNI152NLin2009cAsym_preproc.nii' file. After clicking ok, you will immediately see some changes. FSL automatically searches for the number of recordings (Total volumes), and the timing between recordings (TR). This is also the window where you can change the high pass filter cutoff (but we will leave this for now). 
+### Data
+The first thing we need to do is to define where FSL can find the preprocessed bold data. To do this please select the Data tab from Feat, and then click on Select 4D data. Then click on the yellow folder button to select the recorded 'xx_bold_space-MNI152NLin2009cAsym_preproc.nii' file. After clicking OK, you will immediately see some changes. FSL automatically searches for the number of recordings (Total volumes), and the timing between recordings (TR). This is also the window where you can change the high pass filter cutoff (but we will leave this for now). 
 
-#![]()
+![Data](pictures/Feat_Data.png)
 
-### data
-- make timing files
 
+### Preprocessing
+Now go to the next tab (Pre-stats) to dene your processing preferences. Because we have already done preprocessing with fMRIprep we will turn everything off here.
+
+![Pre-stats](pictures/Feat_prestats.png)
+
+### Registration
+FSL needs some input in the registration option to work on a higher level (group level) later. Note that this is not the registration that we will be using. 
+As fMRIprep has already done a much better job. To trick FSL choose the 6DOF option. For it all to work we also need to adjust some of the outputs, but that we will do after Feat has run.
+
+![registration](pictures/Feat_registration.png)
+
+### stats
+The next step is to inform FSL what you have been recording (what was your participant doing at each recording time) and what analysis you would like to preform.
+
+1. First prepare your timing files
 ```{bash}
 cd /data1/projects/fMRI-course/fMRIcourse/Spinoza_Course/other
 # again start R
@@ -208,42 +221,92 @@ cd /data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events
 # check out the files created in /data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events
 ```
 
-### Preprocessing
-- everything off
+2. Now we will start the model set-up
+- First turn off FILM prewhitening.
+- Second, we need to exclude some of the confounds fMRIprep computed.fMRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
 
-### Stats
-- adjust and add confound parameters
-fMPRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
-
-+ in your terminal open the counfounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
++ in your terminal open the confounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
 
 ```{bash}
 libreoffice5.2 sub-001_task-StopSignal_run-1_bold_confounds.tsv
 ```
+- Third, tick the box add additional confounds, and select this confounds_feat.csv file that you just created
+- __Fourth__, we are going to set up our design! Select Full model setup. You will now see a new GUI appear to define your general linear model. Here we have to first specify all that is done by this participant and at what time. While in the scanner, our subject was preforming a stop signal task (as explained at the beginning of this week). Here, the following things could happen:
+1. On trials where there is no instruction to stop
+(a) Participants can correctly choose a response ( Go; timing_GoCorrect.bfsl)
+(b) Participants can choose an incorrect response ( Error; timing_ChoiceError.bfsl)
+2. On trials where there is a sudden stop instruction
+(a) Participants can be on time, and successfully stop their planned response (SS; timing_successful_stop.bfsl)
+(b) Participants can NOT stop on time and press, also called stop respond trials (FS; timing_Failed_stop.bfsl)
 
-- define model
-- Specify your desing
+- __Fifth__,specify your predictions. First, change the total number of original EV's to 4 (the events described above). Now we will define each event so that we can evaluate differences between the conditions in FSL. The first EV we will define as the trials where participants correctly choose a response (GO). For the option Basic shape choose 'custom (3 column format)', and then select the *timing_GoCorrect.bsfl* file with the yellow button tab. Then choose 'Double-Gamma HRF' for convolution, and make sure that both the 'add temporal derivative' (important for event related designs), and 'apply temporal filtering' boxes are selected (these should be yellow).
+
+![Feat defition of EV example](pictures/Feat_evs.png)
+
+Now proceed to define all EV's in the same manner with the following order of EV's: 1) Go, 2) Error, 3) SS, 4) FS. Make sure to select the matching .bfsl file for each tab.
+
+-The 6 step is to specify what you would be interested in to examine. First, for each participant, and later on a group level.
+For simplicity we will now only define a few options. But, in general, it is best to define all possible events or contrasts of interest already at individual subject level. For now we want to specify 1) the event for each condition, 2) activity levels when all conditions are defined as positive,  and 3) activity when all conditions are defined as negative. To give you an idea of how differences between conditions are defined, we will also evaluate what regions in the brain are activated more during Stop trails when compared to Go trials. Note that this step can also be specified in a later step, when we are interested in activity levels across groups.
+
+After the specification of all EV's, select the tab Contrasts & F-tests. We will now define Each EV as an event of interest (contrast) and look at differences between Stop and Go. First, define each EV with the number 1 (see pic below), this defines the weight that is given to each event of interest. 
+
+![Feat contrasts](pictures/Feat_contrasts.png)
+
+Those who scan the Stop-task are usually are interested in those regions within the brain that are activated more during Stop trials, when compared to the Go trials. To evaluate this we will give 1 as a weight to the Stop EV and a -1 as a weight to the Go EV. We will then do the same but ask what regions are activated more during Go [1] when compared to Stop [-1]. Finally, we would like to evaluate what regions of the brain are activated when all EV's are defined as positive [1] or negative [-1]. The positive contrast contains 1s for every EV and it will show us where in the brain activity correlates positively with all EVs. In a way this contrast corresponds to the active state of the brain. The negative contrast contains -1s for every EV and it will show us where in the brain activity correlates negatively with all EVs. In a way this contrast corresponds to the resting state of the brain and usually shows activity along the mid line of the brain.
+
+- _Finally_, don't forget to evaluate your design matrix (also looking at what the confound parameters do)
+
+![Feat design](pictures/Feat_modelconfounds.png)
+
+and Efficiency.
+
+![Feat efficiency](pictures/Feat_efficiency_confounds.png)
+
+Use the green boxes or the fsl Feat help online to increase your understanding. After the evaluation, press 'done' to continue with your first level (individual subject run) design.
+
 
 ### Post-stats tab
-- uncorrected
+Because we are mostly interested in group level inferences, you can now leave the post-stats tab as it is (see figure below to sure that everything is as it should be with default). For group level analysis - once we get to average individual subjects - this tab is used to define the type of threshold (cluster or voxel) and the desired alpha (p-value) to be used for significant outcomes.
 
-### Registration
-- FSL needs some input to the registration to work on a higher level. Note that this is not the registration that we will be using. 
-As fMRIprep has already done a much better job. To trick FSL chose the 6DOF option. 
+Keep in mind that cluster or voxel based thresholding is very important when we want to analyse multiple subjects but not handy when you want to evaluate whether 1 subject is showing meaningful activation. 
 
-This needs to be done exactly as in the video (key to higher level analysis)
+![Feat Post-stats](pictures/Feat_poststats.png)
+
+## save your design
+Now save the design with the name first level.fsf in the FSL folder. Make sure to have read most green boxes and understood all the steps that we just went through before you continue. Do not press the Go button. Feat takes some time to process and for this we will work in tmux.
+
+```{bash}
+cd [path where you safed the firstlevel.fsf file]
+# now type
+tmux # followed by enter
+feat firstlevel.fsf #enter
+```
+
+Your first level analysis is running!
+
+## set the registration right
+for FSL to work on group level we need to work around it's registration pypline. Carefully follow the instructions in the video!
 https://www.youtube.com/watch?time_continue=7&v=U3tG7JMEf7M
 
 # Check First level results
+While feat is running, its output is placed in a .feat directory. When FEAT has finished with the analysis, you can view the results by opening report.html located in the Feat directory. Report.html is a webpage with a summary of the analysis. Once your feat has run navigate to this directory, and open the report.html file. 
+
 ## Feat Evaluation
 ### Stats tab
+To evaluate the reliability of your recording, it is important to always check
+the active and rest contrast. As stated earlier these evaluate what regions of the
+brain correlate positively with our events (active) or negatively (rest). While this
+evaluations should not be as stringent as the other two above, you would always
+like to verify if there is any region at all for this subject that responds (+ or -) to
+your task.
 ## Inspect your data
 
 # Higher Level results
-## The stop vs go contrast
+Statistical results of only one subject usually don't tell us that much. With higher level analysis, inferences can be made about a whole group, of if you have different populations between groups.Unfortunately we don't have the time to go over the different types of analysis one could do across a group of participants.
 
-#Conclusion
 
+# Conclusion
+With this short introduction we never intended to teach you all there is to know about fMRI analysis, nor to make you ready for conducting your own experiments. Our main goal was to make you a little bit familiar with the pipeline of fMRI processing, experimental design, and some of the pitfalls that one should always evaluate. For those who are interested in learning more: FSL is a free analysis package for fMRI analysis and provides really good (to our opinion) instructions and courses to educate each of you in how fMRI data is best analysed. 
 
 
 
