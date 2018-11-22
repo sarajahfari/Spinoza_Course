@@ -20,7 +20,7 @@ make_fslevents=function(base,datadir,outputdir)
   for (f in outputdir)
   {
     wd=getwd()
-    dir.create(f,overwrite=T)
+    dir.create(f)
     setwd(paste(wd,'/',f,'/',sep=''))
   }
   
