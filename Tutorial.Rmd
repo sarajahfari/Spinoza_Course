@@ -89,7 +89,7 @@ img.to_filename(file_dir)
 
 4. Make event files
 
-In order to run preprocessing and the analysis of you experiment later, we need to convert the timing files from the scanner such that we know when each event (Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.) occured across the scan, and what the duration was. In this task, an event start when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
+In order to run preprocessing and the analysis of you experiment later, we need to convert the timing files from the scanner such that we know when each event occured across the scan, and what the duration was (i.e., Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.). In the stop task, an event starts when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
 
 + cd back to the directory with all the git codes, and open R (just type R into terminal). The enter the following code. Make sure to fill in the path where you saved the raw input from the scanner. 
 
@@ -97,20 +97,23 @@ In order to run preprocessing and the analysis of you experiment later, we need 
 cd /Users/sarajahfari/Documents/Github/Spinoza_Course/BIDS
 ```
 
+- now type R into terminal and press enter
+
 ```{r}
 source('Generateevents_tsv_stopsignal.R')
-datadir = "/Users/sarajahfari/Aeneas_shared/2018/visual/fMRIcourse/raw_data/3T/behavior"
-outputdir="/Users/sarajahfari/Aeneas_shared/2018/visual/fMRIcourse/bids_data/3T/sub-001/func"
+datadir = "/data1/projects/fMRI-course/fMRIcourse/raw_data/3T/behavior"
+outputdir="/data1/projects/fMRI-course/fMRIcourse/bids_data/3T/sub-001/func"
 bidsname='sub-001'
 
+# this function creates an events.tsv file in the bids_data/xx/xx/func folder
 Make_stopevents(datadir,bidsname,outputdir)
-```
+q() # this is to quit R, say n for savin workspace
 
+# open the .tsv file with a text program to see what just happend
+```
 
 ### Inspect Raw images with FSL
 FSLeyes allows you to visually inspect most types of MRI images. Before you start your inspection, a few short notes on what you will be seeing on screen. Each selected image will be opened in an orthogonal view; coronal, sagittal and axial views are displayed simultaneously. If there is sufficient information present in the image header, L, R, A, P, S, I (Left, Right, Anterior=front, Posterior=back, Superior=top, Inferior=bottom) orientation markers will be displayed, making the orientation clear. 
-
-
 
 1. To inspect images, first in your terminal type:
 ```{bash}
@@ -131,10 +134,12 @@ Now that we have organized the files in BIDS format, we can start running the pr
 ## how to run fMRIPrep
 1. download the fmriprep_tmux.py from the github repro
 2. Because this processing might take a while we would like to run the code on the server, and keep it running overnight. To do this go to terminal and enter:
+
 ```{bash}
 tmux
 ```
 + this will open a new session in which we can run the preprocessing
+
 3. Now cd to the frmiprep_tmux.py folder and use the following command to run fMRIPrep
 ```{bash}
 python fmriprep_tmux.py [path to bids directory] \
@@ -145,11 +150,13 @@ python fmriprep_tmux.py [path to bids directory] \
                         [use ica? please fill in 0 which is NO] 
 ```
 4. logout of your tmux session. In your terminal type:
+
 ```{bash}
 ctrl+b and then d
 ```
 
 ## Inspecting the output
+
 1. log into your tmux session againg to check if the preprocessing is done.
 ```{bash}
 tmux ls
@@ -175,48 +182,45 @@ Feat
 2. Data
 + The first thing we need to do is to define where FSL can find the preprocessed bold data. To do this please select the Data tab from Feat, and then click on Select 4D data. Then click on the yellow folder button to select the recorded 'xx_bold_space-MNI152NLin2009cAsym_preproc.nii' file. After clicking ok, you will immediately see some changes. FSL automatically searches for the number of recordings (Total volumes), and the timing between recordings (TR). This is also the window where you can change the high pass filter cutoff (but we will leave this for now). 
 
-+ check the timing if this is not correct (maybe remove with new dicom conversion) do the following
-```{python}
-# import module
-import nibabel as nb
-
-# change timing
-file_dir = '/data1/projects/fMRI-course/Pilots/deriv_data/3T/fmriprep/sub-001/func/sub-001_task-StopSignal_run-1_bold_space-MNI152NLin2009cAsym_preproc.nii.gz'
-load_file =  nb.load(file_dir)  
-
-header = load_file.header
-affine = load_file.affine
-data = load_file.get_data()
-header['pixdim'][4] = header['pixdim'][4]/1000
-
-img = nb.Nifti1Image(data, affine=affine, header=header)
-img.to_filename(file_dir)
-
-# taken from change_tr_nii.py written by M. Szinte
-```
+#![]()
 
 ### data
-- change timing files back
 - make timing files
 
-```{bas}
-cd /Users/sarajahfari/Documents/Github/Spinoza_Course
+```{bash}
+cd /data1/projects/fMRI-course/fMRIcourse/Spinoza_Course/other
+# again start R
+R
 ```
 
 ```{r}
-source('other/Make_fslevents.r')
-base="/Users/sarajahfari/Aeneas_shared/2018/visual/fMRIcourse/"
-datadir="/Users/sarajahfari/Aeneas_shared/2018/visual/fMRIcourse/bids_data/3T/sub-001/func"
+source('Make_fslevents.r')
+base="/data1/projects/fMRI-course/fMRIcourse/"
+datadir="/data1/projects/fMRI-course/fMRIcourse/bids_data/3T/sub-001/func"
 outputdir=c('FSL','3T','Firstlevel',"sub-001","events")
 
 make_fslevents(base,datadir,outputdir)
+q()
 ```
 
+```{bas}
+cd /data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events
+# check out the files created in /data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events
+```
 
 ### Preprocessing
 - everything off
 
 ### Stats
+- adjust and add confound parameters
+fMPRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
+
++ in your terminal open the counfounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
+
+```{bash}
+libreoffice5.2 sub-001_task-StopSignal_run-1_bold_confounds.tsv
+```
+
 - define model
 - Specify your desing
 
@@ -224,7 +228,8 @@ make_fslevents(base,datadir,outputdir)
 - uncorrected
 
 ### Registration
-- dof registration to 6!
+- FSL needs some input to the registration to work on a higher level. Note that this is not the registration that we will be using. 
+As fMRIprep has already done a much better job. To trick FSL chose the 6DOF option. 
 
 This needs to be done exactly as in the video (key to higher level analysis)
 https://www.youtube.com/watch?time_continue=7&v=U3tG7JMEf7M
