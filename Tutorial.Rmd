@@ -83,11 +83,34 @@ img.to_filename(file_dir)
 # taken from change_tr_nii.py written by M. Szinte
 ```
   
-  3. Make the .json files needed 
+3. Make the .json files needed 
   [do this later with Martin, also ask about change_tr_nii.py]
+
+
+4. Make event files
+
+In order to run preprocessing and the analysis of you experiment later, we need to convert the timing files from the scanner such that we know when each event (Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.) occured across the scan, and what the duration was. In this task, an event start when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
+
++ cd back to the directory with all the git codes, and open R (just type R into terminal). The enter the following code. Make sure to fill in the path where you saved the raw input from the scanner. 
+
+```{bas}
+cd /Users/sarajahfari/Documents/Github/Spinoza_Course/BIDS
+```
+
+```{r}
+source('Generateevents_tsv_stopsignal.R')
+datadir = "/Users/sarajahfari/Aeneas_shared/2018/visual/fMRIcourse/raw_data/3T/behavior"
+outputdir="/Users/sarajahfari/Aeneas_shared/2018/visual/fMRIcourse/bids_data/3T/sub-001/func"
+bidsname='sub-001'
+
+Make_stopevents(datadir,bidsname,outputdir)
+```
+
 
 ### Inspect Raw images with FSL
 FSLeyes allows you to visually inspect most types of MRI images. Before you start your inspection, a few short notes on what you will be seeing on screen. Each selected image will be opened in an orthogonal view; coronal, sagittal and axial views are displayed simultaneously. If there is sufficient information present in the image header, L, R, A, P, S, I (Left, Right, Anterior=front, Posterior=back, Superior=top, Inferior=bottom) orientation markers will be displayed, making the orientation clear. 
+
+
 
 1. To inspect images, first in your terminal type:
 ```{bash}
@@ -142,15 +165,67 @@ Everytime you run fMRIPrep, the html file will contain a method section, where a
 ## Files to use for the next level
 
 # Lower level Analysis in FSL
+Now that we have carefully preprocessed the recorded _bold.nii.gz files we want you to get a glimpse of how fMRI data is actually processed into the ’blobby’ images that you usually will find in most scientific papers. The analysis of the imaging recordings is commonly first done for each subject individually, and averaged on later stages to make inferences at group level. In this section we will just focus on one subject to give you an idea of how to analyse subjects individually. To do this, we will be using FSL FEAT.
+
 ## First level analysis using FEAT
-Now that we have carefully preprocessed the recorded _bold.nii.gz files we want you to get a glimpse of how fMRI data is actually processed into the ’blobby’ images that you usually will find in most scientific papers. The analysis of the imaging recordings is commonly first done for each subject individually, and averaged on later stages to make inferences at group level. In this section we will just focus on one subjectto given you an idea of how to analyse subjects individually. To do this, we will be using FSL FEAT.
+1. in your terminal type:
+```{bash}
+Feat
+```
+2. Data
++ The first thing we need to do is to define where FSL can find the preprocessed bold data. To do this please select the Data tab from Feat, and then click on Select 4D data. Then click on the yellow folder button to select the recorded 'xx_bold_space-MNI152NLin2009cAsym_preproc.nii' file. After clicking ok, you will immediately see some changes. FSL automatically searches for the number of recordings (Total volumes), and the timing between recordings (TR). This is also the window where you can change the high pass filter cutoff (but we will leave this for now). 
+
++ check the timing if this is not correct (maybe remove with new dicom conversion) do the following
+```{python}
+# import module
+import nibabel as nb
+
+# change timing
+file_dir = '/data1/projects/fMRI-course/Pilots/deriv_data/3T/fmriprep/sub-001/func/sub-001_task-StopSignal_run-1_bold_space-MNI152NLin2009cAsym_preproc.nii.gz'
+load_file =  nb.load(file_dir)  
+
+header = load_file.header
+affine = load_file.affine
+data = load_file.get_data()
+header['pixdim'][4] = header['pixdim'][4]/1000
+
+img = nb.Nifti1Image(data, affine=affine, header=header)
+img.to_filename(file_dir)
+
+# taken from change_tr_nii.py written by M. Szinte
+```
 
 ### data
+- change timing files back
+- make timing files
+
+```{bas}
+cd /Users/sarajahfari/Documents/Github/Spinoza_Course
+```
+
+```{r}
+source('other/Make_fslevents.r')
+base="/Users/sarajahfari/Aeneas_shared/2018/visual/fMRIcourse/"
+datadir="/Users/sarajahfari/Aeneas_shared/2018/visual/fMRIcourse/bids_data/3T/sub-001/func"
+outputdir=c('FSL','3T','Firstlevel',"sub-001","events")
+
+make_fslevents(base,datadir,outputdir)
+```
+
+
 ### Preprocessing
+- everything off
+
 ### Stats
-### Specify your desing
+- define model
+- Specify your desing
+
 ### Post-stats tab
+- uncorrected
+
 ### Registration
+- dof registration to 6!
+
 This needs to be done exactly as in the video (key to higher level analysis)
 https://www.youtube.com/watch?time_continue=7&v=U3tG7JMEf7M
 
