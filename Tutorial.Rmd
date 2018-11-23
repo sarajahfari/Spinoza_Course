@@ -18,78 +18,153 @@ library(reticulate)
 use_python("/usr/bin/python")
 ```
 
-
-# The basics 
+# To start
 ## Working with Linux
-Linux is an open source operating system that is commonly used for scientific research. fMRIPrep & FSL, the programs we use for fMRI analysis in this tutorial, both run on Linux, or the OS operating system. Because we will be using Linux servers, this tutorial is based on Linux. The drawback of Linux is that most students have no experience with this operating system. Therefore we start with a small introduction.
+Linux is an open source operating system commonly used by scientists. MRIQC, fMRIPrep and FSL, that are the softwares we will use for fMRI analysis in this tutorial, run all on Linux, or on an OS operating system. For these reasons this tutorial is based on Linux. The drawback of Linux is that most students have no experience with this operating system. Therefore we start with a small introduction.
 
 ## Getting Started
-The recordings have been placed in **/data1/projects/fMRI-course/[name of your group]** on the server we will be working from. Throughout the afternoon you will work from this folder, to get a glimpse in how to analyse fMRI data using *BIDS*, *fMRIPrep* and *FSL*. Please log in onto the Spinoza server using your own credentials. Linux programs can be started via a link (for instance via the links on the desktop or under the 'Applications' button), or via the console window. This console window is similar to the windows Command Prompt. The console window is also called terminal depending on the Linux flavor. 
+The recordings have been placed for you in **/data1/projects/fMRI-course/[name of your group]** on the server we will be working from. You will work from this folder and get a glimpse in how analysing fMRI data using *BIDS*, *MRIQC*, *fMRIPrep* and *FSL*. Please log in onto the Spinoza server using your own credentials ("student01" to "student20") and the common password (please ask us). Linux programs can be started via a link (for instance via the links on the desktop or under the 'Applications' button), or via the console window. This console window is similar to the windows Command Prompt or MAC OSX Terminal. The console window is also called Terminal depending on the Linux flavor. 
 
-## Working directory
-Please open a new terminal window (right click mouse, and choose *Open Terminal*) and type in the following command to move towards your **/data1/projects/fMRI-course/[name of your group]** folder:
+## Working directory & Connect to *compute-01*
+Please open a new terminal window (*Applications >> System Tools >> Terminal*).
+
+First, using this command, connect to the computation node of the Spinoza centre ("compute-01"):
 
 ```{bash}
-cd /data1/projects/fMRI-course/[name of your group]
+ssh -Y compute-01
 ```
 
-This command will make sure that all your following instructions are carried out from the course folder.
+Second, load the necessary modules for the following codes:
 
-# BIDS
-After the class on Tuesday we trust that you now understand what BIDS is, and why we all urge you to start using BIDS. 
+```{bash}
+module load collections/default
+```
+
+# BIDS format
+This tutorial is here help you to convert your data in the BIDS format, in order to later give you the possibility to use BIDS Apps (MRIQC and FRMIPREP).
 
 ## The BIDS data structure
-The raw files that you have been collecting have been exported with the extension .par and .rec. In this section we will convert these files to NIFTI, organize them in accordance with the BIDS guidelines, and inspect the recordings with FSLeyes.
+Your scanning sessions have been exported with the extensions .par and .rec. In this section we will first convert these files to NIFTI, organize them in accordance with the BIDS guidelines, verify the validity of our formating, and finally inspect the data using FSLeyes.
 
-### Convert files to BIDS structure
-1. Convert files from PAR/REC to nifti
-  + use the cd command to go to your raw_data directory
-  + get the convert2niigz.py script from the BIDS folder in 'https://github.com/sarajahfari/Spinoza_Course', and put this file in **/data1/projects/fMRI-course/[name of your group]**
-  + in terminal cd to the folder where convert2niigz.py script is in and use the following command: 
+
+### Convert files from PAR/REC to nifti
+ 
+  + use the cd command to change your directory to the converter function *convert2niigz.py*
+	
+```{bash}
+cd /data1/projects/fMRI-Course/Spinoza_Course/BIDS/
+```
+  
+  + convert your data to nii.gz format using "dcm2niix" (recommanded option)
 
 ```{bash}  
-python convert2niigz.py [path to your raw_data folder] 
+python convert2niigz.py [path to your raw_data folder] dcm2niix
 ```
 
-2. Convert files to BIDS
-  + get the bids_generator.py script from the BIDS folder in 'https://github.com/sarajahfari/Spinoza_Course', and put this in **/data1/projects/fMRI-course/[name of your group]**
-  + cd to this directory
-  + type: mkdir bids_data and press enter (this is to make a directory where your converted BIDS files will be saved)
-  + Then use the bids_generator.py script to convert your nifti files to BIDS
+  + as an alternative use "parrec2nii" (it might create errors in TR timing)
+	
 ```{bash}  
-python bids_generator.py [path to raw data ] \
-[path to bids_data] [subject bids number e.g. sub-001] \
-[task name, e.g., Stop Signal]
+python convert2niigz.py [path to your raw_data folder] parrec2nii
 ```
-  
-  + change timing Nifti files BOLD to fit BIDS description
-  
-```{python}
-# import module
-import nibabel as nb
 
-# change timing
-file_dir = '[path to your bids_data folder]/sub-001/func/[insertname]_bold.nii.gz'
-load_file =  nb.load(file_dir)  
+### Organize the files in accordance with the BIDS format
 
-header = load_file.header
-affine = load_file.affine
-data = load_file.get_data()
-header['pixdim'][4] = header['pixdim'][4]*1000
-
-img = nb.Nifti1Image(data, affine=affine, header=header)
-img.to_filename(file_dir)
-
-# taken from change_tr_nii.py written by M. Szinte
+ + use the cd command to change your directory towards the converter function *bids_generator.py*
+	
+```{bash}
+cd /data1/projects/fMRI-Course/Spinoza_Course/BIDS/
 ```
+		
+  + generate a BIDS dataset with this command:
+
+```{bash}  
+python bids_generator.py [raw data path] [bids data path] [subject name] [task name]
+# e.g. python bids_generator /data1/projects/fMRI-Course/proj-01/raw_data/ /data1/projects/fMRI-Course/proj-01/bids_data/ sub-001 MyTask
+```
+    
+### Create the JSON files
+
+ + *dataset_description.json*
+
+ This first json file should be put in the BIDS root directory and should contain basic information about the dataset. Note that you can put all the information you would like here, such as the task instructions.
+ 
+```{bash}  
+{"Name": "MyTask task blablabla in 3T scanner",
+"BIDSVersion":  "1.1.1",
+"Authors": ["Sara Jahfari, Martin Szinte"]}
+```
+ + *task-MyTask_bold.json*
+
+ This second file should also be put in the BIDS root directory and should contain  information the scanning session. These information can be obtained from your scanning assistant/physicist, read within the .par files of the raw data or computed (see below). We here present the information strictly necessary, more information can be reported here. Refer to http://bids.neuroimaging.io and to the BIDS specification file (http://bids.neuroimaging.io/bids_spec.pdf) for details.
+
+```	
+{"RepetitionTime": 0.700,
+"EchoTime": 0.030,
+"EpiFactor": 53,
+"WaterFatShift": 14.042,
+"PhaseEncodingDirection": "j",
+"SenseFactor": 4,
+"SliceDirection": "z",
+"MultiBandFactor": 4,
+"EchoTimeDifference":0.00253,
+"EffectiveEchoSpacing": 0.00015193,
+"SliceTiming": [0.0,0.0636,0.1273,0.1909,0.2545,0.3182,0.3818,0.4455,0.5091,0.5727,0.6364,0.0,0.0636,0.1273,0.1909,0.2545,0.3182,0.3818,0.4455,0.5091,0.5727,0.6364,0.0,0.0636,0.1273,0.1909,0.2545,0.3182,0.3818,0.4455,0.5091,0.5727,0.6364,0.0,0.0636,0.1273,0.1909,0.2545,0.3182,0.3818,0.4455,0.5091,0.5727,0.6364],
+"SliceOrder": "ascending",
+"TaskName": "MyTask"}
+```
+####Read in .par file of bold scan file:
   
-3. Make the .json files needed 
-  [do this later with Martin, also ask about change_tr_nii.py]
+"RepetitionTime" >>  "Repetition time [ms]"
+ 
+"EchoTime" >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
+  
+"EpiFactor" >> "EPI factor"
+ 
+"WaterFatShift" >> Water Fat shift [pixels]
+ 
+"TaskName" >> pick the name you used for the bids generator
+ 
+####Read in .par file of B0 scan file:
+ 
+"EchoTimeDifference": >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
+  
+####Ask your scanning assistant / physicist:
 
+"PhaseEncodingDirection"
+ 
+"SenseFactor"
+ 
+"SliceDirection"
+ 
+"MultiBandFactor"
+ 
+"SliceOrder" (multi-band)
 
-4. Make event files
+####Compute values yoursefl
+ 
+"EffectiveEchoSpacing" >> edit with your scan information "calc_echo_spacing_philips_mod.py" (in SUBLIME TEXT or TextEdit for example) and obtain the correct value.
+ 
+"SliceTiming" >> edit "calc_slice_timing.py" with your scan information and obtain the correct values (be carefull to edit the results to match the example above). Note that if this informtion is not given, FMRIPREP will not apply any slice timing correction.
+ 
+ + *fmap/sub-00X_phasediff.json*
 
-In order to run preprocessing and the analysis of you experiment later, we need to convert the timing files from the scanner such that we know when each event occurred across the scan, and what the duration was (i.e., Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.). In the stop task, an event starts when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
+This third file should be put in the /fmap folder of each subject and should contain information about the B0 field map scans to apply to the bold sessions. Information can be read within the .par files or computed.
+
+```
+{"EchoTime1": 0.030,
+"EchoTime2": 0.03253,
+"IntendedFor": ["func/sub-00X_task-MyTask_run-1_bold.nii.gz","func/sub-00X_task-MyTask_run-2_bold.nii.gz"]}
+```
+
+"EchoTime1" >> same as "EchoTime" of *task-MyTask_bold.json*
+
+"EchoTime2" >> sum of "EchoTime" and "EchoTimeDifference" of *task-MyTask_bold.json*
+
+"IntendedFor" >> list the path of bold sequence for which this field map should be apply
+
+### Make event files (optional)
+
+We could then convert the timing files from the scanner such that we know when each event occurred across the scan, and what the duration was (i.e., Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.). For example, in a stop task, an event starts when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
 
 + cd back to the directory with all the git codes, and open R (just type R into terminal). The enter the following code. Make sure to fill in the path where you saved the raw input from the scanner. 
 
@@ -112,6 +187,10 @@ q() # this is to quit R, say n for savin workspace
 # open the .tsv file with a text program to see what just happend
 ```
 
+### Check the validity of your bids dataset
+
+Using a web validator ("https://bids-standard.github.io/bids-validator/") verify that your dataset is valid. Note that your dataset can stay with "warnings" but not with "errors". Correct the errors as a function of the description given on the website to obtain a validaded dataset. Only then you can go to the next step.
+
 ### Inspect Raw images with FSL
 FSLeyes allows you to visually inspect most types of MRI images. Before you start your inspection, a few short notes on what you will be seeing on screen. Each selected image will be opened in an orthogonal view; coronal, sagittal and axial views are displayed simultaneously. If there is sufficient information present in the image header, L, R, A, P, S, I (Left, Right, Anterior=front, Posterior=back, Superior=top, Inferior=bottom) orientation markers will be displayed, making the orientation clear. 
 
@@ -128,32 +207,34 @@ fsleyes
 
 Structural MRI scans improve the process of normalizing the fMRI scan to a standard space. This step is important because you want to report, in the end, on the activation at the group level (referring to the entire group). The brain of individual subjects differ substantially from each other and therefore the fMRI scans (epi) need to be normalized towards a common space for all participants. We will now turn, to the preprocessing of data using fMRIPrep.
 
-# fMRIPrep
+# MRIQC
+
+To quickly check the validity of your BIDS dataset and to determine the quality of your scan (T1w or EPI), you can run MRIQC. 
+
+To run MRIQC, use the following command:
+
+```{bash}
+cd /data1/projects/fMRI-Course/Spinoza_Course/MRIQC/
+python mriqc_tmux [main directory] [bids directory] [deriv directory] [temp directory] [subject] [processessors]
+```
+
+The software will be run on a tmux (terminal multiplexer) and will take about an hour.
+Please, refer to the course of Tuesday for some details about the output of MRIQC.
+
+# FMRIPREP
+
+Now that we have organized the files in BIDS format, we can start to preproces the data using fMRIprep.
+
+To run FMRIPREP, use the following command:
+
+```{bash}
+cd /data1/projects/fMRI-Course/Spinoza_Course/FMRIPREP/
+python fmriprep_tmux.py [main directory] [bids directory] [deriv directory] [temp directory] [subject] [processessors] [use aroma]
+```
+The software will be run on a tmux (terminal multiplexer) and will take about 10h to 12h to run.
+Please, refer to the course of Tuesday for some details about the output of FMRIPREP.
+
 Now that we have organized the files in BIDS format, we can start running the preprocessing with fMRIprep.
-
-## how to run fMRIPrep
-1. download the fmriprep_tmux.py from the github repro
-2. Because this processing might take a while we would like to run the code on the server, and keep it running overnight. To do this go to terminal and enter:
-
-```{bash}
-tmux
-```
-+ this will open a new session in which we can run the preprocessing
-
-3. Now cd to the fmriprep_tmux.py folder and use the following command to run fMRIPrep
-```{bash}
-python fmriprep_tmux.py [path to bids directory] \
-                        [path to deriv_data directory]\
-                        [path to temp directory]\
-                        [bids subject name, e.g., sub-001]\
-                        [server number of threds, ask us!]\
-                        [use ica? please fill in 0 which is NO] 
-```
-4. logout of your tmux session. In your terminal type:
-
-```{bash}
-ctrl+b and then d
-```
 
 ## Inspecting the output
 
@@ -164,7 +245,7 @@ tmux attach -tx
 ```
 2. The output of fMRIPrep is saved in the deriv_data folder, where you can easily inspect the preprocessing by opening the html file. Given the class on Tuesday, how do you think the preprocessing looks? If you have doubts, call for one of us.
 
-3. Again use fsleyes to load the preprocessed MNI _BOLD and T1w files. What is the difference with the raw BIDS files you saw?
+3. Again use fsleyes to load the preprocessed MNI_BOLD and T1w files. What is the difference with the raw BIDS files you saw?
 
 ## Reporting
 Every time you run fMRIPrep, the html file will contain a method section, where all the steps are carefully described. Please honor the developers by using this as a template for writing your method section for reports!
