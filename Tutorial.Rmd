@@ -81,7 +81,7 @@ cd /data1/projects/fMRI-Course/Spinoza_Course/BIDS/
 python bids_generator.py [raw data path] [bids data path] [subject name] [task name]
 # e.g. python bids_generator /data1/projects/fMRI-Course/proj-01/raw_data/ /data1/projects/fMRI-Course/proj-01/bids_data/ sub-001 MyTask
 ```
-    
+
 ### Create the JSON files
 
  + *dataset_description.json*
@@ -97,7 +97,7 @@ python bids_generator.py [raw data path] [bids data path] [subject name] [task n
 
  This second file should also be put in the BIDS root directory and should contain  information the scanning session. These information can be obtained from your scanning assistant/physicist, read within the .par files of the raw data or computed (see below). We here present the information strictly necessary, more information can be reported here. Refer to http://bids.neuroimaging.io and to the BIDS specification file (http://bids.neuroimaging.io/bids_spec.pdf) for details.
 
-```	
+```	{json}
 {"RepetitionTime": 0.700,
 "EchoTime": 0.030,
 "EpiFactor": 53,
@@ -112,55 +112,55 @@ python bids_generator.py [raw data path] [bids data path] [subject name] [task n
 "SliceOrder": "ascending",
 "TaskName": "MyTask"}
 ```
-####Read in .par file of bold scan file:
+### Read in .par file of bold scan file:
   
-"RepetitionTime" >>  "Repetition time [ms]"
+>"RepetitionTime" >>  "Repetition time [ms]"
  
-"EchoTime" >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
+>"EchoTime" >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
   
-"EpiFactor" >> "EPI factor"
+>"EpiFactor" >> "EPI factor"
  
-"WaterFatShift" >> Water Fat shift [pixels]
+>"WaterFatShift" >> Water Fat shift [pixels]
  
-"TaskName" >> pick the name you used for the bids generator
+>"TaskName" >> pick the name you used for the bids generator
  
-####Read in .par file of B0 scan file:
+### Read in .par file of B0 scan file:
  
-"EchoTimeDifference": >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
+>"EchoTimeDifference": >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
   
-####Ask your scanning assistant / physicist:
+### Ask your scanning assistant / physicist:
 
-"PhaseEncodingDirection"
+>"PhaseEncodingDirection"
  
-"SenseFactor"
+>"SenseFactor"
  
-"SliceDirection"
+>"SliceDirection"
  
-"MultiBandFactor"
+>"MultiBandFactor"
  
-"SliceOrder" (multi-band)
+>"SliceOrder" (multi-band)
 
-####Compute values yoursefl
+### Compute values yoursefl
  
-"EffectiveEchoSpacing" >> edit with your scan information "calc_echo_spacing_philips_mod.py" (in SUBLIME TEXT or TextEdit for example) and obtain the correct value.
+>"EffectiveEchoSpacing" >> edit with your scan information "calc_echo_spacing_philips_mod.py" (in SUBLIME TEXT or TextEdit for example) and obtain the correct value.
  
-"SliceTiming" >> edit "calc_slice_timing.py" with your scan information and obtain the correct values (be carefull to edit the results to match the example above). Note that if this informtion is not given, FMRIPREP will not apply any slice timing correction.
+>"SliceTiming" >> edit "calc_slice_timing.py" with your scan information and obtain the correct values (be carefull to edit the results to match the example above). Note that if this informtion is not given, FMRIPREP will not apply any slice timing correction.
  
  + *fmap/sub-00X_phasediff.json*
 
 This third file should be put in the /fmap folder of each subject and should contain information about the B0 field map scans to apply to the bold sessions. Information can be read within the .par files or computed.
 
-```
+```{json}
 {"EchoTime1": 0.030,
 "EchoTime2": 0.03253,
 "IntendedFor": ["func/sub-00X_task-MyTask_run-1_bold.nii.gz","func/sub-00X_task-MyTask_run-2_bold.nii.gz"]}
 ```
 
-"EchoTime1" >> same as "EchoTime" of *task-MyTask_bold.json*
+>"EchoTime1" >> same as "EchoTime" of *task-MyTask_bold.json*
 
-"EchoTime2" >> sum of "EchoTime" and "EchoTimeDifference" of *task-MyTask_bold.json*
+>"EchoTime2" >> sum of "EchoTime" and "EchoTimeDifference" of *task-MyTask_bold.json*
 
-"IntendedFor" >> list the path of bold sequence for which this field map should be apply
+>"IntendedFor" >> list the path of bold sequence for which this field map should be apply
 
 ### Make event files (optional)
 
@@ -168,16 +168,16 @@ We could then convert the timing files from the scanner such that we know when e
 
 + cd back to the directory with all the git codes, and open R (just type R into terminal). The enter the following code. Make sure to fill in the path where you saved the raw input from the scanner. 
 
-```{bas}
-cd /Users/sarajahfari/Documents/Github/Spinoza_Course/BIDS
+```{bash}
+cd /data1/projects/fMRI-course/Spinoza_Course/BIDS
 ```
 
 - now type R into terminal and press enter
 
 ```{r}
 source('Generateevents_tsv_stopsignal.R')
-datadir = "/data1/projects/fMRI-course/fMRIcourse/raw_data/3T/behavior"
-outputdir="/data1/projects/fMRI-course/fMRIcourse/bids_data/3T/sub-001/func"
+datadir = "/data1/projects/fMRI-course/[your folder]/raw_data/3T/behavior"
+outputdir="/data1/projects/fMRI-course/[your folder]/bids_data/3T/sub-001/func"
 bidsname='sub-001'
 
 # this function creates an events.tsv file in the bids_data/xx/xx/func folder
@@ -282,15 +282,15 @@ The next step is to inform FSL what you have been recording (what was your parti
 
 1. First prepare your timing files
 ```{bash}
-cd /data1/projects/fMRI-course/fMRIcourse/Spinoza_Course/other
+cd /data1/projects/fMRI-course/Spinoza_Course/other
 # again start R
 R
 ```
 
 ```{r}
 source('Make_fslevents.r')
-base="/data1/projects/fMRI-course/fMRIcourse/"
-datadir="/data1/projects/fMRI-course/fMRIcourse/bids_data/3T/sub-001/func"
+base="/data1/projects/fMRI-course/"
+datadir="/data1/projects/fMRI-course/[your folder]/bids_data/3T/sub-001/func"
 outputdir=c('FSL','3T','Firstlevel',"sub-001","events")
 
 make_fslevents(base,datadir,outputdir)
@@ -298,15 +298,15 @@ q()
 ```
 
 ```{bas}
-cd /data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events
-# check out the files created in /data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events
+cd /data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events
+# check out the files created in /data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events
 ```
 
 2. Now we will start the model set-up
 - First turn off FILM prewhitening.
 - Second, we need to exclude some of the confounds fMRIprep computed.fMRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
 
-+ in your terminal open the confounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
++ in your terminal open the confounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
 
 ```{bash}
 libreoffice5.2 sub-001_task-StopSignal_run-1_bold_confounds.tsv
@@ -357,7 +357,7 @@ Keep in mind that cluster or voxel based thresholding is very important when we 
 Now save the design with the name first level.fsf in the FSL folder. Make sure to have read most green boxes and understood all the steps that we just went through before you continue. Do not press the Go button. Feat takes some time to process and for this we will work in tmux.
 
 ```{bash}
-cd [path where you safed the firstlevel.fsf file]
+cd [path where you saved the firstlevel.fsf file]
 # now type
 tmux # followed by enter
 feat firstlevel.fsf #enter
@@ -370,7 +370,7 @@ for FSL to work on group level we need to work around it's registration pypline.
 https://www.youtube.com/watch?time_continue=7&v=U3tG7JMEf7M
 
 # Check First level results
-While feat is running, its output is placed in a .feat directory. When FEAT has finished with the analysis, you can view the results by opening report.html located in the Feat directory. Report.html is a webpage with a summary of the analysis. Once your feat has run navigate to this directory, and open the report.html file. 
+While feat is running, its output is placed in a *.feat* directory. When FEAT has finished with the analysis, you can view the results by opening report.html located in the Feat directory. Report.html is a webpage with a summary of the analysis. Once your feat has run navigate to this directory, and open the report.html file. 
 
 ## Feat Evaluation
 ### Stats tab
@@ -380,7 +380,7 @@ brain correlate positively with our events (active) or negatively (rest). While 
 evaluations should not be as stringent as the other two above, you would always
 like to verify if there is any region at all for this subject that responds (+ or -) to
 your task.
-## Inspect your data
+
 
 # Higher Level results
 Statistical results of only one subject usually don't tell us that much. With higher level analysis, inferences can be made about a whole group, of if you have different populations between groups.Unfortunately we don't have the time to go over the different types of analysis one could do across a group of participants.
