@@ -304,14 +304,14 @@ cd /data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events
 
 2. Now we will start the model set-up
 - First turn off FILM prewhitening.
-- Second, we need to exclude some of the confounds fMRIprep computed.fMRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
+- Second, we need to exclude some of the confounds fMRIprep computed. fMRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
 
-+ in your terminal open the confounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
++ In your terminal open the confounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
 
 ```{bash}
 libreoffice5.2 sub-001_task-StopSignal_run-1_bold_confounds.tsv
 ```
-- Third, tick the box add additional confounds, and select this confounds_feat.csv file that you just created
+- Third, tick the box add additional confounds, and select this confounds_feat.csv file that you just created.
 - __Fourth__, we are going to set up our design! Select Full model setup. You will now see a new GUI appear to define your general linear model. Here we have to first specify all that is done by this participant and at what time. While in the scanner, our subject was preforming a stop signal task (as explained at the beginning of this week). Here, the following things could happen:
 1. On trials where there is no instruction to stop
 (a) Participants can correctly choose a response ( Go; timing_GoCorrect.bfsl)

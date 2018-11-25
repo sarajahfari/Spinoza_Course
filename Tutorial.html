@@ -1722,12 +1722,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ol>
 <ul>
 <li>First turn off FILM prewhitening.</li>
-<li><p>Second, we need to exclude some of the confounds fMRIprep computed.fMRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.</p></li>
-<li><p>in your terminal open the confounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in <em>‘/data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events’</em> as confounds_feat.csv. Use the following command in terminal to open you file.</p></li>
+<li><p>Second, we need to exclude some of the confounds fMRIprep computed. fMRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.</p></li>
+<li><p>In your terminal open the confounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in <em>‘/data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events’</em> as confounds_feat.csv. Use the following command in terminal to open you file.</p></li>
 </ul>
 <div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="ex">libreoffice5.2</span> sub-001_task-StopSignal_run-1_bold_confounds.tsv</a></code></pre></div>
 <ul>
-<li>Third, tick the box add additional confounds, and select this confounds_feat.csv file that you just created</li>
+<li>Third, tick the box add additional confounds, and select this confounds_feat.csv file that you just created.</li>
 <li><strong>Fourth</strong>, we are going to set up our design! Select Full model setup. You will now see a new GUI appear to define your general linear model. Here we have to first specify all that is done by this participant and at what time. While in the scanner, our subject was preforming a stop signal task (as explained at the beginning of this week). Here, the following things could happen:</li>
 </ul>
 <ol style="list-style-type: decimal">
