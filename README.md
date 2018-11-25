@@ -1,13 +1,10 @@
 ---
 title: "README"
-author: "Sara Jahfari"
+author: "Sara Jahfari and Martin Szinte"
 date: "11/13/2018"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-## This repository contains suppporting codes and tutotrials for the Spinoza fMRI Course 2018
+# This repository contains a tutorial and supporting codes for the Spinoza fMRI Course 2018
 
