@@ -286,7 +286,7 @@ As FMRIPREP has already done a much better job. To trick FSL choose the 6DOF opt
 
 ![registration](pictures/Feat_registration.png)
 
-### stats
+### Stats
 The next step is to inform FSL what you have been recording (what was your participant doing at each recording time) and what analysis you would like to preform.
 
 1. First prepare your timing files
@@ -392,7 +392,7 @@ your task.
 
 
 # Higher Level results
-Statistical results of only one subject usually don't tell us that much. With higher level analysis, inferences can be made about a whole group, of if you have different populations between groups.Unfortunately we don't have the time to go over the different types of analysis one could do across a group of participants.
+Statistical results of only one subject usually don't tell us that much. With higher level analysis, inferences can be made about a whole group, of if you have different populations between groups. Unfortunately we don't have the time to go over the different types of analysis one could do across a group of participants.
 
 
 # Conclusion
