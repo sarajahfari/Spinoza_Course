@@ -12,6 +12,7 @@ sys.argv[3]: deriv directory
 sys.argv[4]: temp directory
 sys.argv[5]: bids subject name (e.g. sub-001)
 sys.argv[6]: server nb of processor to use (e.g 4)
+sys.argv[7]: your name to create your tmux session (e.g. student01)
 -----------------------------------------------------------------------------------------
 Output(s):
 BIDS files
@@ -21,7 +22,7 @@ ssh -Y compute-01
 module load collections/default
 cd /data1/projects/fMRI-course/Spinoza_Course/
 python mriqc_tmux.py [main directory] [bids directory] [deriv directory] [temp directory] 
-					 [subject] [processessors]
+					 [subject] [processessors] [your id]
 -----------------------------------------------------------------------------------------
 Written by Martin Szinte (martin.szinte@gmail.com)
 -----------------------------------------------------------------------------------------
@@ -31,7 +32,6 @@ Written by Martin Szinte (martin.szinte@gmail.com)
 import sys
 import os
 import time
-opj = os.path.join
 
 # inputs
 main_dir = sys.argv[1]
@@ -40,6 +40,7 @@ deriv_dir = sys.argv[3]
 temp_dir = sys.argv[4]
 sub = sys.argv[5]
 nb_procs = int(sys.argv[6])
+your_id = sys.argv[7]
 
 # define singularity and fs licence
 singularity_dir = '/packages/singularity_containers/poldracklab_mriqc_0.11.0-2018-06-05-442554ee49a6.img'
@@ -56,7 +57,7 @@ singularity_cmd = "singularity run --bind /{main_dir}:/{main_dir} {dir} {source}
 									)
 
 # define tmux session
-session_name = "{sub}_mriqc".format(sub = sub)
+session_name = "{id}_{sub}_mriqc".format(id = your_id, sub = sub)
 
 # run singularity
 print('run singularity on tmux {session_name}'.format(session_name = session_name))
