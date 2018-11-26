@@ -1,5 +1,5 @@
 ---
-title: "A bird's eye in the analysis of fMRI data with fMRIPrep and FSL"
+title: "A bird's eye in the analysis of fMRI data with FMRIPREP and FSL"
 author: "S. Jahfari & M. Szinte"
 date: "11/14/2018"
 output: 
@@ -18,91 +18,170 @@ library(reticulate)
 use_python("/usr/bin/python")
 ```
 
-
-# The basics 
+# To start
 ## Working with Linux
-Linux is an open source operating system that is commonly used for scientific research. fMRIPrep & FSL, the programs we use for fMRI analysis in this tutorial, both run on Linux, or the OS operating system. Because we will be using Linux servers, this tutorial is based on Linux. The drawback of Linux is that most students have no experience with this operating system. Therefore we start with a small introduction.
+Linux is an open source operating system commonly used by scientists. MRIQC, FMRIPREP and FSL, that are the softwares we will use for fMRI analysis in this tutorial, run all on Linux, or on an OS operating system. For these reasons this tutorial is based on Linux. The drawback of Linux is that most students have no experience with this operating system. Therefore we start with a small introduction.
 
 ## Getting Started
-The recordings have been placed in **/data1/projects/fMRI-course/[name of your group]** on the server we will be working from. Throughout the afternoon you will work from this folder, to get a glimpse in how to analyse fMRI data using *BIDS*, *fMRIPrep* and *FSL*. Please log in onto the Spinoza server using your own credentials. Linux programs can be started via a link (for instance via the links on the desktop or under the 'Applications' button), or via the console window. This console window is similar to the windows Command Prompt. The console window is also called terminal depending on the Linux flavor. 
+The recordings have been placed for you in **/data1/projects/fMRI-course/[name of your group]** on the server we will be working from. You will work from this folder and get a glimpse in the analysis of fMRI data using *BIDS*, *MRIQC*, *FMRIPREP* and *FSL*. Please log in onto the Spinoza server using your own credentials ("student01" to "student20") and the common password (please ask us). Linux programs can be started via a link (for instance via the links on the desktop or under the 'Applications' button), or via the console window. This console window is similar to the windows Command Prompt or MAC OSX Terminal. The console window is also called Terminal depending on the Linux flavor. 
 
-## Working directory
-Please open a new terminal window (right click mouse, and choose *Open Terminal*) and type in the following command to move towards your **/data1/projects/fMRI-course/[name of your group]** folder:
+## Working directory & Connect to *compute-01*
+
+Please open a new terminal window 
+
+> *Applications >> System Tools >> Terminal*
+
+First, using this command, connect to the computation node of the Spinoza centre ("compute-01"):
 
 ```{bash}
-cd /data1/projects/fMRI-course/[name of your group]
+ssh -Y compute-01
 ```
 
-This command will make sure that all your following instructions are carried out from the course folder.
+Second, load the necessary modules with the following lines:
 
-# BIDS
-After the class on Tuesday we trust that you now understand what BIDS is, and why we all urge you to start using BIDS. 
+```{bash}
+module load collections/default
+```
+
+# BIDS format
+This tutorial is here help you to convert your data in the BIDS format, in order to later give you the possibility to use BIDS Apps (MRIQC and FRMIPREP).
 
 ## The BIDS data structure
-The raw files that you have been collecting have been exported with the extension .par and .rec. In this section we will convert these files to NIFTI, organize them in accordance with the BIDS guidelines, and inspect the recordings with FSLeyes.
+Your scanning sessions have been exported with the extensions .PAR and .REC. In this section we will first convert these files to NIFTI, organize them in accordance with the BIDS guidelines, verify the validity of our formating, and finally inspect the data using FSLeyes.
 
-### Convert files to BIDS structure
-1. Convert files from PAR/REC to nifti
-  + use the cd command to go to your raw_data directory
-  + get the convert2niigz.py script from the BIDS folder in 'https://github.com/sarajahfari/Spinoza_Course', and put this file in **/data1/projects/fMRI-course/[name of your group]**
-  + in terminal cd to the folder where convert2niigz.py script is in and use the following command: 
+
+### Convert files from PAR/REC to nifti
+ 
+  + use the cd command to change your directory to the converter function *convert2niigz.py*
+	
+```{bash}
+cd /data1/projects/fMRI-Course/Spinoza_Course/BIDS/
+```
+  
+  + convert your data to nii.gz format using "dcm2niix" (recommanded option)
 
 ```{bash}  
-python convert2niigz.py [path to your raw_data folder] 
+python convert2niigz.py [path to your raw_data folder] dcm2niix
 ```
 
-2. Convert files to BIDS
-  + get the bids_generator.py script from the BIDS folder in 'https://github.com/sarajahfari/Spinoza_Course', and put this in **/data1/projects/fMRI-course/[name of your group]**
-  + cd to this directory
-  + type: mkdir bids_data and press enter (this is to make a directory where your converted BIDS files will be saved)
-  + Then use the bids_generator.py script to convert your nifti files to BIDS
+  + as an alternative use "parrec2nii" (it might create errors in TR timing)
+	
 ```{bash}  
-python bids_generator.py [path to raw data ] \
-[path to bids_data] [subject bids number e.g. sub-001] \
-[task name, e.g., Stop Signal]
+python convert2niigz.py [path to your raw_data folder] parrec2nii
 ```
-  
-  + change timing Nifti files BOLD to fit BIDS description
-  
-```{python}
-# import module
-import nibabel as nb
 
-# change timing
-file_dir = '[path to your bids_data folder]/sub-001/func/[insertname]_bold.nii.gz'
-load_file =  nb.load(file_dir)  
+### Organize the files in accordance with the BIDS format
 
-header = load_file.header
-affine = load_file.affine
-data = load_file.get_data()
-header['pixdim'][4] = header['pixdim'][4]*1000
-
-img = nb.Nifti1Image(data, affine=affine, header=header)
-img.to_filename(file_dir)
-
-# taken from change_tr_nii.py written by M. Szinte
+ + use the cd command to change your directory towards the converter function *bids_generator.py*
+	
+```{bash}
+cd /data1/projects/fMRI-Course/Spinoza_Course/BIDS/
 ```
+		
+  + generate a BIDS dataset with this command:
+
+```{bash}  
+python bids_generator.py [raw data path] [BIDS data path] [subject name] [task name]
+# e.g. python bids_generator /data1/projects/fMRI-Course/proj-01/raw_data/ /data1/projects/fMRI-Course/proj-01/bids_data/ sub-001 MyTask
+```
+
+### Create the JSON files
+
+ + *dataset_description.json*
+
+This first json file should be put in the BIDS root directory and should contain basic information about the dataset. Note that you can put all the information you would like here, such as the task instructions.
+ 
+```{json}  
+{"Name": "MyTask task blablabla in 3T scanner",
+"BIDSVersion":  "1.1.1",
+"Authors": ["Sara Jahfari, Martin Szinte"]}
+```
+ + *task-MyTask_bold.json*
+
+This second file should also be put in the BIDS root directory and should contain  information the scanning session. These information can be obtained from your scanning assistant/physicist, read within the .par files of the raw data or computed (see below). We here present the information strictly necessary, more information can be reported here. Refer to http://bids.neuroimaging.io and to the BIDS specification file (http://bids.neuroimaging.io/bids_spec.pdf) for details.
+
+```{json}
+{"RepetitionTime": 0.700,
+"EchoTime": 0.030,
+"EpiFactor": 53,
+"WaterFatShift": 14.042,
+"PhaseEncodingDirection": "j",
+"SenseFactor": 4,
+"SliceDirection": "z",
+"MultiBandFactor": 4,
+"EchoTimeDifference":0.00253,
+"EffectiveEchoSpacing": 0.00015193,
+"SliceTiming": [0.0,0.0636,0.1273,0.1909,0.2545,0.3182,0.3818,0.4455,0.5091,0.5727,0.6364,0.0,0.0636,0.1273,0.1909,0.2545,0.3182,0.3818,0.4455,0.5091,0.5727,0.6364,0.0,0.0636,0.1273,0.1909,0.2545,0.3182,0.3818,0.4455,0.5091,0.5727,0.6364,0.0,0.0636,0.1273,0.1909,0.2545,0.3182,0.3818,0.4455,0.5091,0.5727,0.6364],
+"SliceOrder": "ascending",
+"TaskName": "MyTask"}
+```
+
+### Read in .PAR file of bold scan file:
   
-3. Make the .json files needed 
-  [do this later with Martin, also ask about change_tr_nii.py]
+>"RepetitionTime" >>  "Repetition time [ms]"
+ 
+>"EchoTime" >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
+  
+>"EpiFactor" >> "EPI factor"
+ 
+>"WaterFatShift" >> Water Fat shift [pixels]
+ 
+>"TaskName" >> pick the name you used for the bids generator
+ 
+### Read in .PAR file of B0 scan file:
+ 
+>"EchoTimeDifference": >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
+  
+### Ask your scanning assistant / physicist:
 
+>"PhaseEncodingDirection"
+ 
+>"SenseFactor"
+ 
+>"SliceDirection"
+ 
+>"MultiBandFactor"
+ 
+>"SliceOrder" (multi-band)
 
-4. Make event files
+### Compute values yourself
+ 
+>"EffectiveEchoSpacing" >> edit with your scan information "calc_echo_spacing_philips_mod.py" (in SUBLIME TEXT or TextEdit for example) and obtain the correct value.
+ 
+>"SliceTiming" >> edit "calc_slice_timing.py" with your scan information and obtain the correct values (be carefull to edit the results to match the example above). Note that if this informtion is not given, FMRIPREP will not apply any slice timing correction.
+ 
+ + *fmap/sub-00X_phasediff.json*
 
-In order to run preprocessing and the analysis of you experiment later, we need to convert the timing files from the scanner such that we know when each event occurred across the scan, and what the duration was (i.e., Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.). In the stop task, an event starts when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
+This third file should be put in the /fmap folder of each subject and should contain information about the B0 field map scans to apply to the bold sessions. Information can be read within the .par files or computed.
+
+```{json}
+{"EchoTime1": 0.030,
+"EchoTime2": 0.03253,
+"IntendedFor": ["func/sub-00X_task-MyTask_run-1_bold.nii.gz","func/sub-00X_task-MyTask_run-2_bold.nii.gz"]}
+```
+
+>"EchoTime1" >> same as "EchoTime" of *task-MyTask_bold.json*
+
+>"EchoTime2" >> sum of "EchoTime" and "EchoTimeDifference" of *task-MyTask_bold.json*
+
+>"IntendedFor" >> list the path of bold sequence for which this field map should be apply
+
+### Make event files (optional)
+
+We could then convert the timing files from the scanner such that we know when each event occurred across the scan, and what the duration was (i.e., Go trial correct, Go trial incorrect, Stop trial successful, Stop trial failed, omission, etc.). For example, in a stop task, an event starts when the go stimulus is presented, and the duration is defined as the total time that the picture was on screen.
 
 + cd back to the directory with all the git codes, and open R (just type R into terminal). The enter the following code. Make sure to fill in the path where you saved the raw input from the scanner. 
 
-```{bas}
-cd /Users/sarajahfari/Documents/Github/Spinoza_Course/BIDS
+```{bash}
+cd /data1/projects/fMRI-course/Spinoza_Course/BIDS
 ```
 
 - now type R into terminal and press enter
 
 ```{r}
 source('Generateevents_tsv_stopsignal.R')
-datadir = "/data1/projects/fMRI-course/fMRIcourse/raw_data/3T/behavior"
-outputdir="/data1/projects/fMRI-course/fMRIcourse/bids_data/3T/sub-001/func"
+datadir = "/data1/projects/fMRI-course/[your folder]/raw_data/3T/behavior"
+outputdir="/data1/projects/fMRI-course/[your folder]/bids_data/3T/sub-001/func"
 bidsname='sub-001'
 
 # this function creates an events.tsv file in the bids_data/xx/xx/func folder
@@ -112,11 +191,16 @@ q() # this is to quit R, say n for savin workspace
 # open the .tsv file with a text program to see what just happend
 ```
 
+### Check the validity of your BIDS dataset
+
+Using a web validator ("https://bids-standard.github.io/bids-validator/") verify that your dataset is valid. Note that your dataset can stay with "warnings" but not with "errors". Correct the errors as a function of the description given on the website to obtain a validaded dataset. Only then you can go to the next step.
+
 ### Inspect Raw images with FSL
 FSLeyes allows you to visually inspect most types of MRI images. Before you start your inspection, a few short notes on what you will be seeing on screen. Each selected image will be opened in an orthogonal view; coronal, sagittal and axial views are displayed simultaneously. If there is sufficient information present in the image header, L, R, A, P, S, I (Left, Right, Anterior=front, Posterior=back, Superior=top, Inferior=bottom) orientation markers will be displayed, making the orientation clear. 
 
 1. To inspect images, first in your terminal type:
 ```{bash}
+module load fsl
 fsleyes
 ```
 
@@ -126,34 +210,40 @@ fsleyes
 
 4. Just to give you an intuition in how the epi or fMRI scan (lot’s of very fast brain recordings) differs from the structural (MRI) scan we would now like you to open the _bold.nii.gz scan in the func folder. Notice how the quality of this image is much lower. This is because with fMRI a lot of brain images are recorded with only a short time between them, which makes the quality of the image go down. You can click on the movie icon to quickly go over all images.
 
-Structural MRI scans improve the process of normalizing the fMRI scan to a standard space. This step is important because you want to report, in the end, on the activation at the group level (referring to the entire group). The brain of individual subjects differ substantially from each other and therefore the fMRI scans (epi) need to be normalized towards a common space for all participants. We will now turn, to the preprocessing of data using fMRIPrep.
+Now to get an idea of the raw time series. First, make sure to click on a voxel, and then do the following:
 
-# fMRIPrep
-Now that we have organized the files in BIDS format, we can start running the preprocessing with fMRIprep.
+> "View >> Time series" 
 
-## how to run fMRIPrep
-1. download the fmriprep_tmux.py from the github repro
-2. Because this processing might take a while we would like to run the code on the server, and keep it running overnight. To do this go to terminal and enter:
+Structural MRI scans improve the process of normalizing the fMRI scan to a standard space. This step is important because you want to report, in the end, on the activation at the group level (referring to the entire group). The brain of individual subjects differ substantially from each other and therefore the fMRI scans (epi) need to be normalized towards a common space for all participants. We will now turn, to the preprocessing of data using FMRIPREP.
 
-```{bash}
-tmux
-```
-+ this will open a new session in which we can run the preprocessing
+# MRIQC
 
-3. Now cd to the fmriprep_tmux.py folder and use the following command to run fMRIPrep
-```{bash}
-python fmriprep_tmux.py [path to bids directory] \
-                        [path to deriv_data directory]\
-                        [path to temp directory]\
-                        [bids subject name, e.g., sub-001]\
-                        [server number of threds, ask us!]\
-                        [use ica? please fill in 0 which is NO] 
-```
-4. logout of your tmux session. In your terminal type:
+To quickly check the validity of your BIDS dataset and to determine the quality of your scan (T1w or EPI), you can run MRIQC. 
+
+To run MRIQC, use the following command:
 
 ```{bash}
-ctrl+b and then d
+cd /data1/projects/fMRI-Course/Spinoza_Course/MRIQC/
+python mriqc_tmux [main directory] [BIDS directory] [deriv directory] [temp directory] [subject] [processessors]
 ```
+
+The software will be run on a tmux (terminal multiplexer) and will take about an hour.
+Please, refer to the course of Tuesday for some details about the output of MRIQC.
+
+# FMRIPREP
+
+Now that we have organized the files in BIDS format, we can start to preproces the data using FMRIPREP.
+
+To run FMRIPREP, use the following command:
+
+```{bash}
+cd /data1/projects/fMRI-Course/Spinoza_Course/FMRIPREP/
+python FMRIPREP_tmux.py [main directory] [BIDS directory] [deriv directory] [temp directory] [subject] [processessors] [use aroma]
+```
+The software will be run on a tmux (terminal multiplexer) and will take about 10h to 12h to run.
+Please, refer to the course of Tuesday for some details about the output of FMRIPREP.
+
+Now that we have organized the files in BIDS format, we can start running the preprocessing with FMRIPREP.
 
 ## Inspecting the output
 
@@ -162,12 +252,12 @@ ctrl+b and then d
 tmux ls
 tmux attach -tx
 ```
-2. The output of fMRIPrep is saved in the deriv_data folder, where you can easily inspect the preprocessing by opening the html file. Given the class on Tuesday, how do you think the preprocessing looks? If you have doubts, call for one of us.
+2. The output of FMRIPREP is saved in the deriv_data folder, where you can easily inspect the preprocessing by opening the html file. Given the class on Tuesday, how do you think the preprocessing looks? If you have doubts, call for one of us.
 
-3. Again use fsleyes to load the preprocessed MNI _BOLD and T1w files. What is the difference with the raw BIDS files you saw?
+3. Again use fsleyes to load the preprocessed MNI_BOLD and T1w files. What is the difference with the raw BIDS files you saw?
 
 ## Reporting
-Every time you run fMRIPrep, the html file will contain a method section, where all the steps are carefully described. Please honor the developers by using this as a template for writing your method section for reports!
+Every time you run FMRIPREP, the html file will contain a method section, where all the steps are carefully described. Please honor the developers by using this as a template for writing your method section for reports!
 
 ## Files to use for the next level
 
@@ -186,30 +276,30 @@ The first thing we need to do is to define where FSL can find the preprocessed b
 
 
 ### Preprocessing
-Now go to the next tab (Pre-stats) to dene your processing preferences. Because we have already done preprocessing with fMRIprep we will turn everything off here.
+Now go to the next tab (Pre-stats) to define your processing preferences. Because we have already done preprocessing with FMRIPREP we will turn everything off here.
 
 ![Pre-stats](pictures/Feat_prestats.png)
 
 ### Registration
 FSL needs some input in the registration option to work on a higher level (group level) later. Note that this is not the registration that we will be using. 
-As fMRIprep has already done a much better job. To trick FSL choose the 6DOF option. For it all to work we also need to adjust some of the outputs, but that we will do after Feat has run.
+As FMRIPREP has already done a much better job. To trick FSL choose the 6DOF option. For it all to work we also need to adjust some of the outputs, but that we will do after Feat has run.
 
 ![registration](pictures/Feat_registration.png)
 
-### stats
+### Stats
 The next step is to inform FSL what you have been recording (what was your participant doing at each recording time) and what analysis you would like to preform.
 
 1. First prepare your timing files
 ```{bash}
-cd /data1/projects/fMRI-course/fMRIcourse/Spinoza_Course/other
+cd /data1/projects/fMRI-course/Spinoza_Course/other
 # again start R
 R
 ```
 
 ```{r}
 source('Make_fslevents.r')
-base="/data1/projects/fMRI-course/fMRIcourse/"
-datadir="/data1/projects/fMRI-course/fMRIcourse/bids_data/3T/sub-001/func"
+base="/data1/projects/fMRI-course/"
+datadir="/data1/projects/fMRI-course/[your folder]/bids_data/3T/sub-001/func"
 outputdir=c('FSL','3T','Firstlevel',"sub-001","events")
 
 make_fslevents(base,datadir,outputdir)
@@ -217,20 +307,20 @@ q()
 ```
 
 ```{bas}
-cd /data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events
-# check out the files created in /data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events
+cd /data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events
+# check out the files created in /data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events
 ```
 
 2. Now we will start the model set-up
 - First turn off FILM prewhitening.
-- Second, we need to exclude some of the confounds fMRIprep computed.fMRIprep outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of fMRIprep. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
+- Second, we need to exclude some of the confounds FMRIPREP computed. FMRIPREP outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of FMRIPREP. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
 
-+ in your terminal open the confounds file in the fMRIprep func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/fMRIcourse/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
++ In your terminal open the confounds file in the FMRIPREP func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
 
 ```{bash}
 libreoffice5.2 sub-001_task-StopSignal_run-1_bold_confounds.tsv
 ```
-- Third, tick the box add additional confounds, and select this confounds_feat.csv file that you just created
+- Third, tick the box add additional confounds, and select this confounds_feat.csv file that you just created.
 - __Fourth__, we are going to set up our design! Select Full model setup. You will now see a new GUI appear to define your general linear model. Here we have to first specify all that is done by this participant and at what time. While in the scanner, our subject was preforming a stop signal task (as explained at the beginning of this week). Here, the following things could happen:
 1. On trials where there is no instruction to stop
 (a) Participants can correctly choose a response ( Go; timing_GoCorrect.bfsl)
@@ -276,7 +366,7 @@ Keep in mind that cluster or voxel based thresholding is very important when we 
 Now save the design with the name first level.fsf in the FSL folder. Make sure to have read most green boxes and understood all the steps that we just went through before you continue. Do not press the Go button. Feat takes some time to process and for this we will work in tmux.
 
 ```{bash}
-cd [path where you safed the firstlevel.fsf file]
+cd [path where you saved the firstlevel.fsf file]
 # now type
 tmux # followed by enter
 feat firstlevel.fsf #enter
@@ -289,7 +379,7 @@ for FSL to work on group level we need to work around it's registration pypline.
 https://www.youtube.com/watch?time_continue=7&v=U3tG7JMEf7M
 
 # Check First level results
-While feat is running, its output is placed in a .feat directory. When FEAT has finished with the analysis, you can view the results by opening report.html located in the Feat directory. Report.html is a webpage with a summary of the analysis. Once your feat has run navigate to this directory, and open the report.html file. 
+While feat is running, its output is placed in a *.feat* directory. When FEAT has finished with the analysis, you can view the results by opening report.html located in the Feat directory. Report.html is a webpage with a summary of the analysis. Once your feat has run navigate to this directory, and open the report.html file. 
 
 ## Feat Evaluation
 ### Stats tab
@@ -299,10 +389,10 @@ brain correlate positively with our events (active) or negatively (rest). While 
 evaluations should not be as stringent as the other two above, you would always
 like to verify if there is any region at all for this subject that responds (+ or -) to
 your task.
-## Inspect your data
+
 
 # Higher Level results
-Statistical results of only one subject usually don't tell us that much. With higher level analysis, inferences can be made about a whole group, of if you have different populations between groups.Unfortunately we don't have the time to go over the different types of analysis one could do across a group of participants.
+Statistical results of only one subject usually don't tell us that much. With higher level analysis, inferences can be made about a whole group, of if you have different populations between groups. Unfortunately we don't have the time to go over the different types of analysis one could do across a group of participants.
 
 
 # Conclusion

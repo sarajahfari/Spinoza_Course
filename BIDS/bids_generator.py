@@ -6,7 +6,7 @@ Goal of the script:
 Convert data in BIDS format
 -----------------------------------------------------------------------------------------
 Input(s):
-sys.argv[1]: subject folder
+sys.argv[1]: raw data folder
 sys.argv[2]: bids folder
 sys.argv[3]: subject bids number (e.g. sub-001)
 sys.argv[4]: task name
@@ -15,8 +15,10 @@ Output(s):
 BIDS files
 -----------------------------------------------------------------------------------------
 To run:
-cd to bids_generator.py folder
-python bids_generator.py /home/shared/2018/visual/fMRIcourse/raw_data/7T/ /home/shared/2018/visual/fMRIcourse/bids_data/7T/ sub-001 StopSignal
+ssh -Y compute-01
+module load collections/default
+cd /data1/projects/fMRI-course/Spinoza_Course/
+python bids_generator.py [raw data path] [bids data path] [subject name] [task name]
 -----------------------------------------------------------------------------------------
 Written by Martin Szinte (martin.szinte@gmail.com)
 -----------------------------------------------------------------------------------------
@@ -27,9 +29,7 @@ import sys
 import os
 import glob
 import nibabel as nb
-import ipdb
 opj = os.path.join
-deb = ipdb.set_trace
 
 # inputs
 raw_dir = sys.argv[1]
@@ -53,24 +53,23 @@ t1w_raw = glob.glob(opj(raw_dir,'nifti','*T1*'))[0]
 t1w_bids = opj(anat_dir,"{}_T1w.nii.gz".format(sub_name_bids))
 os.system("{cmd} {orig} {dest}".format(cmd = trans_cmd, orig = t1w_raw, dest = t1w_bids))
 
-# T2w
-t2w_raw = glob.glob(opj(raw_dir,'nifti','*T2*'))
-if len(t2w_raw)>0:
-	t2w_raw = glob.glob(opj(raw_dir,'nifti','*T2*'))[0]
-	t2w_bids = opj(anat_dir,"{}_T2w.nii.gz".format(sub_name_bids))
-	os.system("{cmd} {orig} {dest}".format(cmd = trans_cmd, orig = t2w_raw, dest = t2w_bids))
-
 # BIDS /fmap
 # ----------
 # B0 magnitude
-b0_magnitude_raw = glob.glob(opj(raw_dir,'nifti','*magnitude*'))[0]
+b0_magnitude_raw = glob.glob(opj(raw_dir,'nifti','*magnitude*')) # if conversion using parrec2nii
+if len(b0_magnitude_raw)==0: # if conversion using dcm2niix
+	b0_magnitude_raw = glob.glob(opj(raw_dir,'nifti','*B0*'))
+	b0_magnitude_raw = [fn for fn in b0_magnitude_raw if 'real' not in fn]
+
 b0_magnitude_bids = opj(fmap_dir,"{}_magnitude1.nii.gz".format(sub_name_bids))
-os.system("{cmd} {orig} {dest}".format(cmd = trans_cmd, orig = b0_magnitude_raw, dest = b0_magnitude_bids))
+os.system("{cmd} {orig} {dest}".format(cmd = trans_cmd, orig = b0_magnitude_raw[0], dest = b0_magnitude_bids))
 
 # B0 phasediff
-b0_phasediff_raw = glob.glob(opj(raw_dir,'nifti','*phasediff*'))[0]
+b0_phasediff_raw = glob.glob(opj(raw_dir,'nifti','*phasediff*')) # if conversion using parrec2nii
+if len(b0_phasediff_raw)==0: # if conversion using dcm2niix
+	b0_phasediff_raw = glob.glob(opj(raw_dir,'nifti','*real*'))
 b0_phasediff_bids = opj(fmap_dir,"{}_phasediff.nii.gz".format(sub_name_bids))
-os.system("{cmd} {orig} {dest}".format(cmd = trans_cmd, orig = b0_phasediff_raw, dest = b0_phasediff_bids))
+os.system("{cmd} {orig} {dest}".format(cmd = trans_cmd, orig = b0_phasediff_raw[0], dest = b0_phasediff_bids))
 
 # BIDS /func
 # ----------
@@ -78,9 +77,9 @@ os.system("{cmd} {orig} {dest}".format(cmd = trans_cmd, orig = b0_phasediff_raw,
 bold_runs_raw = glob.glob(opj(raw_dir,'nifti','*bold*'))
 if len(bold_runs_raw)==0:
 	bold_runs_raw = glob.glob(opj(raw_dir,'nifti','*FN*'))
-
 if len(bold_runs_raw)==0:
 	bold_runs_raw = glob.glob(opj(raw_dir,'nifti','*run*'))
+# add another line here if your raw data does not contain any of the above names
 
 for run_num,bold_run_raw in enumerate(bold_runs_raw):	
 	bold_run_bids = opj(func_dir,"{sub}_task-{task}_run-{run:.0f}_bold.nii.gz".format(sub = sub_name_bids, task = task_name, run = run_num+1))
