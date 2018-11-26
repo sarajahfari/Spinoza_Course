@@ -14,6 +14,7 @@ sys.argv[5]: bids subject name (e.g. sub-001)
 sys.argv[6]: server nb of threads (e.g. 8)
 sys.argv[7]: use of ICA-AROMA analysis and define dimensionality(0 = NO, -1 = YES 
 			 without specifying number of IC, 1-INF: YES with IC number)
+sys.argv[8]: your name to create your tmux session (e.g. student01)
 -----------------------------------------------------------------------------------------
 Output(s):
 BIDS files
@@ -33,7 +34,6 @@ Written by Martin Szinte (martin.szinte@gmail.com)
 import sys
 import os
 import time
-opj = os.path.join
 
 # inputs
 main_dir = sys.argv[1]
@@ -43,6 +43,7 @@ temp_dir = sys.argv[4]
 sub = sys.argv[5]
 nb_thread = int(sys.argv[6])
 ica_aroma_dim = int(sys.argv[7])
+your_id = sys.argv[8]
 
 # define singularity and fs licence
 singularity_dir = '/packages/singularity_containers/poldracklab_fmriprep_1.1.8-2018-10-04-8958de85c5c6.img'
@@ -67,7 +68,7 @@ singularity_cmd = "singularity run --bind /{main_dir}:/{main_dir} {dir} {source}
 									)
 
 # define tmux session
-session_name = "{sub}_fmriprep".format(sub = sub)
+session_name = "{id}_{sub}_fmriprep".format(id = your_id, sub = sub)
 
 # run singularity
 print('run singularity on tmux {session_name}'.format(session_name = session_name))
