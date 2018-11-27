@@ -15,7 +15,7 @@ sys.argv[6]: server nb of threads (e.g. 8)
 sys.argv[7]: your name to create your tmux session (e.g. student01)
 -----------------------------------------------------------------------------------------
 Output(s):
-BIDS files
+Preprocessed data and confound regressors in deriv directory
 -----------------------------------------------------------------------------------------
 To run:
 ssh -Y compute-01

@@ -15,7 +15,7 @@ sys.argv[6]: server nb of processor to use (e.g 4)
 sys.argv[7]: your name to create your tmux session (e.g. student01)
 -----------------------------------------------------------------------------------------
 Output(s):
-BIDS files
+QC html file
 -----------------------------------------------------------------------------------------
 To run:
 ssh -Y compute-01
