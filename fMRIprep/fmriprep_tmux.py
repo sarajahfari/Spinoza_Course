@@ -47,7 +47,7 @@ singularity_dir = '/packages/singularity_containers/poldracklab_fmriprep_1.1.8-2
 fs_licence = '/data1/projects/fMRI-course/fMRIcourse/license.txt'
 
 # run singularity
-singularity_cmd = "singularity run --bind /{main_dir}:/{main_dir} {dir} {source} {deriv_dir} participant --participant_label {sub} -w {temp} --output-space T1w template fsaverage --nthreads {nb_thread:.0f} --use-syn-sdc --low-mem --fs-license-file {fs_licence}".format(  
+singularity_cmd = "singularity run --bind /{main_dir}:/{main_dir} {dir} {source} {deriv_dir} participant --participant_label {sub} -w {temp} --output-space T1w template fsaverage --nthreads {nb_thread:.0f} --use-syn-sdc --low-mem --fs-license-file {fs_licence} --no-submm-recon --fs-no-reconall".format(  
 									main_dir = main_dir,
 									dir =singularity_dir, 
 									source = bids_dir, 
