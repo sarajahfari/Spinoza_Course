@@ -276,7 +276,8 @@ The first thing we need to do is to define where FSL can find the preprocessed b
 
 
 ### Preprocessing
-Now go to the next tab (Pre-stats) to define your processing preferences. Because we have already done preprocessing with FMRIPREP we will turn everything off here.
+Now go to the next tab (Pre-stats) to define your processing preferences. Because we have already done preprocessing with FMRIPREP we will turn everything off here except the option Highpass. Think about wheter or not you want some spatial smooting.
+Note that with the incorporation of the sine/cosine counfounds from FMRIPREP you won't need to use highpass. But in this tutorial we won't use those (but check the description online!).
 
 ![Pre-stats](pictures/Feat_prestats.png)
 
@@ -312,7 +313,7 @@ cd /data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events
 ```
 
 2. Now we will start the model set-up
-- First turn off FILM prewhitening.
+- First turn on FILM prewhitening.
 - Second, we need to exclude some of the confounds FMRIPREP computed. FMRIPREP outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of FMRIPREP. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.
 
 + In your terminal open the confounds file in the FMRIPREP func folder with the following command and remove all columns except the ones named above. Then save the file in _'/data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events'_ as confounds_feat.csv. Use the following command in terminal to open you file.
@@ -331,7 +332,7 @@ libreoffice5.2 sub-001_task-StopSignal_run-1_bold_confounds.tsv
 
 - __Fifth__,specify your predictions. First, change the total number of original EV's to 4 (the events described above). Now we will define each event so that we can evaluate differences between the conditions in FSL. The first EV we will define as the trials where participants correctly choose a response (GO). For the option Basic shape choose 'custom (3 column format)', and then select the *timing_GoCorrect.bsfl* file with the yellow button tab. Then choose 'Double-Gamma HRF' for convolution, and make sure that both the 'add temporal derivative' (important for event related designs), and 'apply temporal filtering' boxes are selected (these should be yellow).
 
-![Feat defition of EV example](pictures/Feat_evs.png)
+![Feat defition of EV example](pictures/Feat_stats.png)
 
 Now proceed to define all EV's in the same manner with the following order of EV's: 1) Go, 2) Error, 3) SS, 4) FS. Make sure to select the matching .bfsl file for each tab.
 
