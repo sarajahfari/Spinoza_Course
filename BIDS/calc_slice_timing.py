@@ -1,6 +1,6 @@
 # calc_slice_timing.py
 import numpy as np
-sense_factor  				= 1
+sense_factor  				= 2.0
 slice_number  				= 72
 tr_duration	 				= 2.0
 

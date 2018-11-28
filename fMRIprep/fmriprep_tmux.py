@@ -20,7 +20,7 @@ Preprocessed data and confound regressors in deriv directory
 To run:
 ssh -Y compute-01
 module load collections/default
-cd /data1/projects/fMRI-course/fMRIcourse/
+cd /data1/projects/fMRI-course/Spinoza_Course/fMRIprep/
 python fmriprep_tmux.py [main directory] [bids directory] [deriv directory] [temp directory]
 						[subject] [processessors] [your id]
 -----------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ your_id = sys.argv[7]
 
 # define singularity and fs licence
 singularity_dir = '/packages/singularity_containers/poldracklab_fmriprep_1.1.8-2018-10-04-8958de85c5c6.img'
-fs_licence = '/data1/projects/fMRI-course/fMRIcourse/license.txt'
+fs_licence = '/data1/projects/fMRI-course/Spinoza_Course/license.txt'
 
 # run singularity
 singularity_cmd = "singularity run --bind /{main_dir}:/{main_dir} {dir} {source} {deriv_dir} participant --participant_label {sub} -w {temp} --output-space T1w template fsaverage --nthreads {nb_thread:.0f} --use-syn-sdc --low-mem --fs-license-file {fs_licence} --no-submm-recon --fs-no-reconall".format(  

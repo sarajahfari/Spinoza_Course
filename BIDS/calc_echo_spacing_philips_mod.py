@@ -35,7 +35,7 @@
 epifactor 					= 49; # EPI factor
 water_fat_shift_pixel 		= 35.699; # water-fat shift per pixel
 fieldstrength_tesla 		= 7.0;  # magnetic field strength (T)
-sense_factor  				= 1; # sense factor
+sense_factor  				= 2; # sense factor
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ not change below line ~~~~~~~~
 

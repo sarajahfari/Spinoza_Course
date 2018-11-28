@@ -20,7 +20,7 @@ QC html file
 To run:
 ssh -Y compute-01
 module load collections/default
-cd /data1/projects/fMRI-course/Spinoza_Course/
+cd /data1/projects/fMRI-course/Spinoza_Course/MRIQC/
 python mriqc_tmux.py [main directory] [bids directory] [deriv directory] [temp directory] 
 					 [subject] [processessors] [your id]
 -----------------------------------------------------------------------------------------
