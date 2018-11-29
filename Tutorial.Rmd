@@ -55,19 +55,21 @@ Your scanning sessions have been exported with the extensions .PAR and .REC. In 
   + use the cd command to change your directory to the converter function *convert2niigz.py*
 	
 ```{bash}
-cd /data1/projects/fMRI-Course/Spinoza_Course/BIDS/
+cd /data1/projects/fMRI-course/Spinoza_Course/BIDS/
 ```
   
   + convert your data to nii.gz format using "dcm2niix" (recommanded option)
 
 ```{bash}  
 python convert2niigz.py [path to your raw_data folder] dcm2niix
+# e.g. convert2niigz.py /data1/projects/my_projet_raw_folder/ dcm2niix
 ```
 
   + as an alternative use "parrec2nii" (it might create errors in TR timing)
 	
 ```{bash}  
 python convert2niigz.py [path to your raw_data folder] parrec2nii
+# e.g. convert2niigz.py /data1/projects/my_projet_raw_folder/ dcm2niix
 ```
 
 ### Organize the files in accordance with the BIDS format
@@ -118,7 +120,7 @@ This second file should also be put in the BIDS root directory and should contai
 
 ### Read in .PAR file of bold scan file:
   
->"RepetitionTime" >>  "Repetition time [ms]"
+>"RepetitionTime" >>  "Repetition time [ms]" convert this data from ms to seconds
  
 >"EchoTime" >> IMAGE INFORMATION TABLE column "echo", be careful convert the value in second
   
@@ -134,21 +136,31 @@ This second file should also be put in the BIDS root directory and should contai
   
 ### Ask your scanning assistant / physicist:
 
->"PhaseEncodingDirection"
+>"PhaseEncodingDirection" => most of the time it is "j"
  
->"SenseFactor"
- 
->"SliceDirection"
+>"SliceDirection" => most of the time it is "z"
  
 >"MultiBandFactor"
  
->"SliceOrder" (multi-band)
+>"SliceOrder" => most of the time it is "ascending"
 
 ### Compute values yourself
  
 >"EffectiveEchoSpacing" >> edit with your scan information "calc_echo_spacing_philips_mod.py" (in SUBLIME TEXT or TextEdit for example) and obtain the correct value.
- 
+
+```{bash}  
+# cd to the Spinoza_Course/BIDS/
+python calc_echo_spacing_philips_mod.py
+# the information will be printed in the terminal
+```
+
 >"SliceTiming" >> edit "calc_slice_timing.py" with your scan information and obtain the correct values (be carefull to edit the results to match the example above). Note that if this informtion is not given, FMRIPREP will not apply any slice timing correction.
+
+```{bash}  
+# cd to the Spinoza_Course/BIDS/
+python calc_echo_spacing_philips_mod.py
+# the information will be printed in the terminal, edit them to have comma between each value and replace any "." by ".0" (e.g. 0. should be written 0.0)
+```
  
  + *fmap/sub-00X_phasediff.json*
 
@@ -223,8 +235,16 @@ To quickly check the validity of your BIDS dataset and to determine the quality 
 To run MRIQC, use the following command:
 
 ```{bash}
+# TYPE THIS AGAIN, if the terminal session was closed
+# ---------------------------------------------------
+# ssh -Y compute-01  
+# module load collections/default
+
 cd /data1/projects/fMRI-Course/Spinoza_Course/MRIQC/
-python mriqc_tmux [main directory] [BIDS directory] [deriv directory] [temp directory] [subject] [processessors]
+python mriqc_tmux.py [main directory] [bids directory] [deriv directory] [temp directory] 
+					 [subject] [processessors] [your id]
+					 
+# e.g. python mriqc_tmux.py data1 /data1/my_bids_data/ /data1/my_deriv_data/ /data1 my_temp_data/ sub-001 8 student01
 ```
 
 The software will be run on a tmux (terminal multiplexer) and will take about an hour.
@@ -237,8 +257,15 @@ Now that we have organized the files in BIDS format, we can start to preproces t
 To run FMRIPREP, use the following command:
 
 ```{bash}
-cd /data1/projects/fMRI-Course/Spinoza_Course/FMRIPREP/
-python FMRIPREP_tmux.py [main directory] [BIDS directory] [deriv directory] [temp directory] [subject] [processessors] [use aroma]
+# TYPE THIS AGAIN, if the terminal session was closed
+# ---------------------------------------------------
+# ssh -Y compute-01  
+# module load collections/default
+
+cd /data1/projects/fMRI-Course/Spinoza_Course/FRMIPREP/
+python fmriprep_tmux.py [main directory] [bids directory] [deriv directory] [temp directory]
+						[subject] [processessors] [your id]
+# e.g. python mriqc_tmux.py data1 /data1/my_bids_data/ /data1/my_deriv_data/ /data1 my_temp_data/ sub-001 8 student01
 ```
 The software will be run on a tmux (terminal multiplexer) and will take about 10h to 12h to run.
 Please, refer to the course of Tuesday for some details about the output of FMRIPREP.
