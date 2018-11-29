@@ -1476,15 +1476,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li>use the cd command to change your directory to the converter function <em>convert2niigz.py</em></li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="bu">cd</span> /data1/projects/fMRI-Course/Spinoza_Course/BIDS/</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="bu">cd</span> /data1/projects/fMRI-course/Spinoza_Course/BIDS/</a></code></pre></div>
 <ul>
 <li>convert your data to nii.gz format using “dcm2niix” (recommanded option)</li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="ex">python</span> convert2niigz.py [path to your raw_data folder] dcm2niix</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="ex">python</span> convert2niigz.py [path to your raw_data folder] dcm2niix</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co"># e.g. convert2niigz.py /data1/projects/my_projet_raw_folder/ dcm2niix</span></a></code></pre></div>
 <ul>
 <li>as an alternative use “parrec2nii” (it might create errors in TR timing)</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="ex">python</span> convert2niigz.py [path to your raw_data folder] parrec2nii</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="ex">python</span> convert2niigz.py [path to your raw_data folder] parrec2nii</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co"># e.g. convert2niigz.py /data1/projects/my_projet_raw_folder/ dcm2niix</span></a></code></pre></div>
 </div>
 <div id="organize-the-files-in-accordance-with-the-bids-format" class="section level3">
 <h3><span class="header-section-number">2.1.2</span> Organize the files in accordance with the BIDS format</h3>
@@ -1528,7 +1530,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="read-in-.par-file-of-bold-scan-file" class="section level3">
 <h3><span class="header-section-number">2.1.4</span> Read in .PAR file of bold scan file:</h3>
 <blockquote>
-<p>“RepetitionTime” &gt;&gt; “Repetition time [ms]”</p>
+<p>“RepetitionTime” &gt;&gt; “Repetition time [ms]” convert this data from ms to seconds</p>
 </blockquote>
 <blockquote>
 <p>“EchoTime” &gt;&gt; IMAGE INFORMATION TABLE column “echo”, be careful convert the value in second</p>
@@ -1552,19 +1554,16 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="ask-your-scanning-assistant-physicist" class="section level3">
 <h3><span class="header-section-number">2.1.6</span> Ask your scanning assistant / physicist:</h3>
 <blockquote>
-<p>“PhaseEncodingDirection”</p>
+<p>“PhaseEncodingDirection” =&gt; most of the time it is “j”</p>
 </blockquote>
 <blockquote>
-<p>“SenseFactor”</p>
-</blockquote>
-<blockquote>
-<p>“SliceDirection”</p>
+<p>“SliceDirection” =&gt; most of the time it is “z”</p>
 </blockquote>
 <blockquote>
 <p>“MultiBandFactor”</p>
 </blockquote>
 <blockquote>
-<p>“SliceOrder” (multi-band)</p>
+<p>“SliceOrder” =&gt; most of the time it is “ascending”</p>
 </blockquote>
 </div>
 <div id="compute-values-yourself" class="section level3">
@@ -1572,16 +1571,22 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <blockquote>
 <p>“EffectiveEchoSpacing” &gt;&gt; edit with your scan information “calc_echo_spacing_philips_mod.py” (in SUBLIME TEXT or TextEdit for example) and obtain the correct value.</p>
 </blockquote>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># cd to the Spinoza_Course/BIDS/</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="ex">python</span> calc_echo_spacing_philips_mod.py</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co"># the information will be printed in the terminal</span></a></code></pre></div>
 <blockquote>
 <p>“SliceTiming” &gt;&gt; edit “calc_slice_timing.py” with your scan information and obtain the correct values (be carefull to edit the results to match the example above). Note that if this informtion is not given, FMRIPREP will not apply any slice timing correction.</p>
 </blockquote>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="co"># cd to the Spinoza_Course/BIDS/</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="ex">python</span> calc_echo_spacing_philips_mod.py</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co"># the information will be printed in the terminal, edit them to have comma between each value and replace any &quot;.&quot; by &quot;.0&quot; (e.g. 0. should be written 0.0)</span></a></code></pre></div>
 <ul>
 <li><em>fmap/sub-00X_phasediff.json</em></li>
 </ul>
 <p>This third file should be put in the /fmap folder of each subject and should contain information about the B0 field map scans to apply to the bold sessions. Information can be read within the .par files or computed.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="fu">{</span><span class="dt">&quot;EchoTime1&quot;</span><span class="fu">:</span> <span class="fl">0.030</span><span class="fu">,</span></a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="dt">&quot;EchoTime2&quot;</span><span class="fu">:</span> <span class="fl">0.03253</span><span class="fu">,</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="dt">&quot;IntendedFor&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;func/sub-00X_task-MyTask_run-1_bold.nii.gz&quot;</span><span class="ot">,</span><span class="st">&quot;func/sub-00X_task-MyTask_run-2_bold.nii.gz&quot;</span><span class="ot">]</span><span class="fu">}</span></a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="fu">{</span><span class="dt">&quot;EchoTime1&quot;</span><span class="fu">:</span> <span class="fl">0.030</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="dt">&quot;EchoTime2&quot;</span><span class="fu">:</span> <span class="fl">0.03253</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="dt">&quot;IntendedFor&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;func/sub-00X_task-MyTask_run-1_bold.nii.gz&quot;</span><span class="ot">,</span><span class="st">&quot;func/sub-00X_task-MyTask_run-2_bold.nii.gz&quot;</span><span class="ot">]</span><span class="fu">}</span></a></code></pre></div>
 <blockquote>
 <p>“EchoTime1” &gt;&gt; same as “EchoTime” of <em>task-MyTask_bold.json</em></p>
 </blockquote>
@@ -1598,20 +1603,20 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ul>
 <li>cd back to the directory with all the git codes, and open R (just type R into terminal). The enter the following code. Make sure to fill in the path where you saved the raw input from the scanner.</li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="bu">cd</span> /data1/projects/fMRI-course/Spinoza_Course/BIDS</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="bu">cd</span> /data1/projects/fMRI-course/Spinoza_Course/BIDS</a></code></pre></div>
 <ul>
 <li>now type R into terminal and press enter</li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">source</span>(<span class="st">'Generateevents_tsv_stopsignal.R'</span>)</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">datadir =<span class="st"> &quot;/data1/projects/fMRI-course/[your folder]/raw_data/3T/behavior&quot;</span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3">outputdir=<span class="st">&quot;/data1/projects/fMRI-course/[your folder]/bids_data/3T/sub-001/func&quot;</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4">bidsname=<span class="st">'sub-001'</span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co"># this function creates an events.tsv file in the bids_data/xx/xx/func folder</span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="kw">Make_stopevents</span>(datadir,bidsname,outputdir)</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="kw">q</span>() <span class="co"># this is to quit R, say n for savin workspace</span></a>
-<a class="sourceLine" id="cb12-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co"># open the .tsv file with a text program to see what just happend</span></a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">source</span>(<span class="st">'Generateevents_tsv_stopsignal.R'</span>)</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">datadir =<span class="st"> &quot;/data1/projects/fMRI-course/[your folder]/raw_data/3T/behavior&quot;</span></a>
+<a class="sourceLine" id="cb14-3" data-line-number="3">outputdir=<span class="st">&quot;/data1/projects/fMRI-course/[your folder]/bids_data/3T/sub-001/func&quot;</span></a>
+<a class="sourceLine" id="cb14-4" data-line-number="4">bidsname=<span class="st">'sub-001'</span></a>
+<a class="sourceLine" id="cb14-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb14-6" data-line-number="6"><span class="co"># this function creates an events.tsv file in the bids_data/xx/xx/func folder</span></a>
+<a class="sourceLine" id="cb14-7" data-line-number="7"><span class="kw">Make_stopevents</span>(datadir,bidsname,outputdir)</a>
+<a class="sourceLine" id="cb14-8" data-line-number="8"><span class="kw">q</span>() <span class="co"># this is to quit R, say n for savin workspace</span></a>
+<a class="sourceLine" id="cb14-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb14-10" data-line-number="10"><span class="co"># open the .tsv file with a text program to see what just happend</span></a></code></pre></div>
 </div>
 <div id="check-the-validity-of-your-bids-dataset" class="section level3">
 <h3><span class="header-section-number">2.1.9</span> Check the validity of your BIDS dataset</h3>
@@ -1623,8 +1628,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ol style="list-style-type: decimal">
 <li>To inspect images, first in your terminal type:</li>
 </ol>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="ex">module</span> load fsl</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="ex">fsleyes</span></a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="ex">module</span> load fsl</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="ex">fsleyes</span></a></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li><p>To open an image, select the ‘add from file’ from the File menu. A file opening dialog will appear. Now browse to the directory where you just stored the BIDS files and start inspecting them.</p></li>
 <li><p>To inspect the anatomical scan select the _T1w.nii.gz file from the anat folder. FSLeyes will now load the recorded structural scan. Click on one of the brains with your mouse, and hold down the button to navigate across the whole brain.</p></li>
@@ -1642,16 +1647,31 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1><span class="header-section-number">3</span> MRIQC</h1>
 <p>To quickly check the validity of your BIDS dataset and to determine the quality of your scan (T1w or EPI), you can run MRIQC.</p>
 <p>To run MRIQC, use the following command:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="bu">cd</span> /data1/projects/fMRI-Course/Spinoza_Course/MRIQC/</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="ex">python</span> mriqc_tmux [main directory] [BIDS directory] [deriv directory] [temp directory] [subject] [processessors]</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co"># TYPE THIS AGAIN, if the terminal session was closed</span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="co"># ---------------------------------------------------</span></a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="co"># ssh -Y compute-01  </span></a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co"># module load collections/default</span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="bu">cd</span> /data1/projects/fMRI-Course/Spinoza_Course/MRIQC/</a>
+<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="ex">python</span> mriqc_tmux.py [main directory] [bids directory] [deriv directory] [temp directory] </a>
+<a class="sourceLine" id="cb16-8" data-line-number="8">                     [<span class="ex">subject</span>] [processessors] [your id]</a>
+<a class="sourceLine" id="cb16-9" data-line-number="9">                     </a>
+<a class="sourceLine" id="cb16-10" data-line-number="10"><span class="co"># e.g. python mriqc_tmux.py data1 /data1/my_bids_data/ /data1/my_deriv_data/ /data1 my_temp_data/ sub-001 8 student01</span></a></code></pre></div>
 <p>The software will be run on a tmux (terminal multiplexer) and will take about an hour. Please, refer to the course of Tuesday for some details about the output of MRIQC.</p>
 </div>
 <div id="fmriprep" class="section level1">
 <h1><span class="header-section-number">4</span> FMRIPREP</h1>
 <p>Now that we have organized the files in BIDS format, we can start to preproces the data using FMRIPREP.</p>
 <p>To run FMRIPREP, use the following command:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="bu">cd</span> /data1/projects/fMRI-Course/Spinoza_Course/FMRIPREP/</a>
-<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="ex">python</span> FMRIPREP_tmux.py [main directory] [BIDS directory] [deriv directory] [temp directory] [subject] [processessors] [use aroma]</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co"># TYPE THIS AGAIN, if the terminal session was closed</span></a>
+<a class="sourceLine" id="cb17-2" data-line-number="2"><span class="co"># ---------------------------------------------------</span></a>
+<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="co"># ssh -Y compute-01  </span></a>
+<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="co"># module load collections/default</span></a>
+<a class="sourceLine" id="cb17-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb17-6" data-line-number="6"><span class="bu">cd</span> /data1/projects/fMRI-Course/Spinoza_Course/FRMIPREP/</a>
+<a class="sourceLine" id="cb17-7" data-line-number="7"><span class="ex">python</span> fmriprep_tmux.py [main directory] [bids directory] [deriv directory] [temp directory]</a>
+<a class="sourceLine" id="cb17-8" data-line-number="8">                        [<span class="ex">subject</span>] [processessors] [your id]</a>
+<a class="sourceLine" id="cb17-9" data-line-number="9"><span class="co"># e.g. python mriqc_tmux.py data1 /data1/my_bids_data/ /data1/my_deriv_data/ /data1 my_temp_data/ sub-001 8 student01</span></a></code></pre></div>
 <p>The software will be run on a tmux (terminal multiplexer) and will take about 10h to 12h to run. Please, refer to the course of Tuesday for some details about the output of FMRIPREP.</p>
 <p>Now that we have organized the files in BIDS format, we can start running the preprocessing with FMRIPREP.</p>
 <div id="inspecting-the-output" class="section level2">
@@ -1659,8 +1679,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ol style="list-style-type: decimal">
 <li>log into your tmux session again to check if the preprocessing is done.</li>
 </ol>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="ex">tmux</span> ls</a>
-<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="ex">tmux</span> attach -tx</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="ex">tmux</span> ls</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="ex">tmux</span> attach -tx</a></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li><p>The output of FMRIPREP is saved in the deriv_data folder, where you can easily inspect the preprocessing by opening the html file. Given the class on Tuesday, how do you think the preprocessing looks? If you have doubts, call for one of us.</p></li>
 <li><p>Again use fsleyes to load the preprocessed MNI_BOLD and T1w files. What is the difference with the raw BIDS files you saw?</p></li>
@@ -1682,7 +1702,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ol style="list-style-type: decimal">
 <li>in your terminal type:</li>
 </ol>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="ex">Feat</span></a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="ex">Feat</span></a></code></pre></div>
 <div id="data" class="section level3">
 <h3><span class="header-section-number">5.1.1</span> Data</h3>
 <p>The first thing we need to do is to define where FSL can find the preprocessed bold data. To do this please select the Data tab from Feat, and then click on Select 4D data. Then click on the yellow folder button to select the recorded ‘xx_bold_space-MNI152NLin2009cAsym_preproc.nii’ file. After clicking OK, you will immediately see some changes. FSL automatically searches for the number of recordings (Total volumes), and the timing between recordings (TR). This is also the window where you can change the high pass filter cutoff (but we will leave this for now).</p>
@@ -1713,16 +1733,16 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <ol style="list-style-type: decimal">
 <li>First prepare your timing files</li>
 </ol>
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="bu">cd</span> /data1/projects/fMRI-course/Spinoza_Course/other</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="co"># again start R</span></a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="ex">R</span></a></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">source</span>(<span class="st">'Make_fslevents.r'</span>)</a>
-<a class="sourceLine" id="cb19-2" data-line-number="2">base=<span class="st">&quot;/data1/projects/fMRI-course/&quot;</span></a>
-<a class="sourceLine" id="cb19-3" data-line-number="3">datadir=<span class="st">&quot;/data1/projects/fMRI-course/[your folder]/bids_data/3T/sub-001/func&quot;</span></a>
-<a class="sourceLine" id="cb19-4" data-line-number="4">outputdir=<span class="kw">c</span>(<span class="st">'FSL'</span>,<span class="st">'3T'</span>,<span class="st">'Firstlevel'</span>,<span class="st">&quot;sub-001&quot;</span>,<span class="st">&quot;events&quot;</span>)</a>
-<a class="sourceLine" id="cb19-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="kw">make_fslevents</span>(base,datadir,outputdir)</a>
-<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="kw">q</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="bu">cd</span> /data1/projects/fMRI-course/Spinoza_Course/other</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="co"># again start R</span></a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="ex">R</span></a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">source</span>(<span class="st">'Make_fslevents.r'</span>)</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">base=<span class="st">&quot;/data1/projects/fMRI-course/&quot;</span></a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">datadir=<span class="st">&quot;/data1/projects/fMRI-course/[your folder]/bids_data/3T/sub-001/func&quot;</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">outputdir=<span class="kw">c</span>(<span class="st">'FSL'</span>,<span class="st">'3T'</span>,<span class="st">'Firstlevel'</span>,<span class="st">&quot;sub-001&quot;</span>,<span class="st">&quot;events&quot;</span>)</a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="kw">make_fslevents</span>(base,datadir,outputdir)</a>
+<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="kw">q</span>()</a></code></pre></div>
 <pre class="bas"><code>cd /data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events
 # check out the files created in /data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events</code></pre>
 <ol start="2" style="list-style-type: decimal">
@@ -1733,7 +1753,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><p>Second, we need to exclude some of the confounds FMRIPREP computed. FMRIPREP outputs a lot of confound variables. A good grasp of all these variables is beyond this course and we advise you to carefully read everything online with the documentation of FMRIPREP. For now we only will use the FramewiseDisplayment, the 6 motion parameters and the aCompCor variables.</p></li>
 <li><p>In your terminal open the confounds file in the FMRIPREP func folder with the following command and remove all columns except the ones named above. Then save the file in <em>‘/data1/projects/fMRI-course/[your folder]/FSL/3T/Firstlevel/sub-001/events’</em> as confounds_feat.csv. Use the following command in terminal to open you file.</p></li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="ex">libreoffice5.2</span> sub-001_task-StopSignal_run-1_bold_confounds.tsv</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="ex">libreoffice5.2</span> sub-001_task-StopSignal_run-1_bold_confounds.tsv</a></code></pre></div>
 <ul>
 <li>Third, tick the box add additional confounds, and select this confounds_feat.csv file that you just created.</li>
 <li><strong>Fourth</strong>, we are going to set up our design! Select Full model setup. You will now see a new GUI appear to define your general linear model. Here we have to first specify all that is done by this participant and at what time. While in the scanner, our subject was preforming a stop signal task (as explained at the beginning of this week). Here, the following things could happen:</li>
@@ -1794,10 +1814,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="save-your-design" class="section level2">
 <h2><span class="header-section-number">5.2</span> save your design</h2>
 <p>Now save the design with the name first level.fsf in the FSL folder. Make sure to have read most green boxes and understood all the steps that we just went through before you continue. Do not press the Go button. Feat takes some time to process and for this we will work in tmux.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="bu">cd</span> [path where you saved the firstlevel.fsf file]</a>
-<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="co"># now type</span></a>
-<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="ex">tmux</span> <span class="co"># followed by enter</span></a>
-<a class="sourceLine" id="cb22-4" data-line-number="4"><span class="ex">feat</span> firstlevel.fsf <span class="co">#enter</span></a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="bu">cd</span> [path where you saved the firstlevel.fsf file]</a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="co"># now type</span></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="ex">tmux</span> <span class="co"># followed by enter</span></a>
+<a class="sourceLine" id="cb24-4" data-line-number="4"><span class="ex">feat</span> firstlevel.fsf <span class="co">#enter</span></a></code></pre></div>
 <p>Your first level analysis is running!</p>
 </div>
 <div id="set-the-registration-right" class="section level2">
